@@ -1,4 +1,4 @@
-/* Helpers for initial module or kernel cmdline parsing
+﻿/* Helpers for initial module or kernel cmdline parsing
    Copyright (C) 2001 Rusty Russell.
 
     This program is free software; you can redistribute it and/or modify
@@ -195,7 +195,8 @@ char *parse_args(const char *doing,
 		int irq_was_disabled;
 
 		args = next_arg(args, &param, &val);
-		pr_info("yyf: parse per param:%s value=%s\n", param, val);
+		pr_info("#### %s File:[%s],Line:[%d] param:[%s] value:[%s]\n",
+			__FUNCTION__, __FILE__, __LINE__, param, val);
 		/* Stop at -- */
 		if (!val && strcmp(param, "--") == 0)
 			return err ?: args;

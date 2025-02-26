@@ -1,4 +1,4 @@
-/* Kernel thread helper functions.
+﻿/* Kernel thread helper functions.
  *   Copyright (C) 2004 IBM Corporation, Rusty Russell.
  *
  * Creation is done via kthreadd, so that we get a clean environment
@@ -578,9 +578,9 @@ EXPORT_SYMBOL(kthread_stop);
 int kthreadd(void *unused)
 {
 	struct task_struct *tsk = current;
-	
-	pr_info("yyf: kthread 2 kthreadd running!! Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
 
+	pr_info("# %s File:[%s],Line:[%d] kthread 2 kthreadd running!!\n", __FUNCTION__, __FILE__, __LINE__);
+	
 	/* Setup a clean context for our children to inherit. */
 	set_task_comm(tsk, "kthreadd");
 	ignore_signals(tsk);
@@ -590,7 +590,7 @@ int kthreadd(void *unused)
 	current->flags |= PF_NOFREEZE;
 	cgroup_init_kthreadd();
 
-	pr_info("yyf: kthread 2 kthreadd enter loop!! Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_info("# %s File:[%s],Line:[%d] kthread 2 kthreadd enter loop!!\n", __FUNCTION__, __FILE__, __LINE__);
 	for (;;) {
 		set_current_state(TASK_INTERRUPTIBLE);
 		if (list_empty(&kthread_create_list))

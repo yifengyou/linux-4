@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 1991, 1992 Linus Torvalds
  * Copyright (C) 1994,      Karl Keyte: Added support for disk statistics
  * Elevator latency, (C) 2000  Andrea Arcangeli <andrea@suse.de> SuSE
@@ -2402,8 +2402,8 @@ EXPORT_SYMBOL_GPL(direct_make_request);
 blk_qc_t submit_bio(struct bio *bio)
 {
 
-	dump_stack();
-	pr_info("yyf: Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
+	// dump_stack();
+	// pr_info("yyf: Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
 
 	/*
 	 * If it's a regular read/write or a barrier with data attached,

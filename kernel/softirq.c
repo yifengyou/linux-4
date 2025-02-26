@@ -1,4 +1,4 @@
-/*
+﻿/*
  *	linux/kernel/softirq.c
  *
  *	Copyright (C) 1992 Linus Torvalds
@@ -752,7 +752,7 @@ static __init int spawn_ksoftirqd(void)
 {
 	pr_info("yyf: early_initcall(spawn_ksoftirqd); Func:%s, File: %s, Line: %d\n",
 				__FUNCTION__, __FILE__, __LINE__);
-	dump_stack();
+	// dump_stack();
 	cpuhp_setup_state_nocalls(CPUHP_SOFTIRQ_DEAD, "softirq:dead", NULL,
 				  takeover_tasklets);
 	BUG_ON(smpboot_register_percpu_thread(&softirq_threads));

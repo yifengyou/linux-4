@@ -189,7 +189,6 @@ void __init e820__print_table(char *who)
 {
 	int i;
 	
-	pr_info("yyf: Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
 
 	for (i = 0; i < e820_table->nr_entries; i++) {
 		pr_info("%s: [mem %#018Lx-%#018Lx] ", who,
@@ -199,8 +198,10 @@ void __init e820__print_table(char *who)
 		e820_print_type(e820_table->entries[i].type);
 		pr_cont("\n");
 	}
+	
+	pr_info("#### %s File:[%s],Line:[%d]\n", __FUNCTION__, __FILE__, __LINE__);
 	for (i = 0; i < e820_table->nr_entries; i++) {
-		pr_info("yyf: %s: [mem %#018Lx-%#018Lx] %9llu(B) = %9llu(KB) = %9llu(MB) = %9llu(GB) ", who,
+		pr_info("##### %s: [mem %#018Lx-%#018Lx] %12llu(B) = %12llu(KB) = %12llu(MB) = %12llu(GB) ", who,
 		       e820_table->entries[i].addr,
 		       e820_table->entries[i].addr + e820_table->entries[i].size - 1,
 		       e820_table->entries[i].size,
@@ -317,7 +318,8 @@ int __init e820__update_table(struct e820_table *table)
 		return -1;
 
 	BUG_ON(table->nr_entries > max_nr_entries);
-	pr_info("yyf: current e820 entry num %d max %d\n", table->nr_entries, max_nr_entries);
+	pr_info("##### %s current e820 entry num %d max %d\n", 
+		__FUNCTION__, table->nr_entries, max_nr_entries);
 
 	/* Bail out if we find any unreasonable addresses in the map: */
 	for (i = 0; i < table->nr_entries; i++) {
@@ -1188,7 +1190,7 @@ void __init e820__reserve_resources_late(void)
 char *__init e820__memory_setup_default(void)
 {
 	char *who = "BIOS-e820";
-	pr_info("yyf: Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_info("#### %s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
 
 	/*
 	 * Try to copy the BIOS-supplied E820-map.
@@ -1227,11 +1229,12 @@ char *__init e820__memory_setup_default(void)
 void __init e820__memory_setup(void)
 {
 	char *who;
-	pr_info("yyf: Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_info("### %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 
 	/* This is a firmware interface ABI - make sure we don't break it: */
 	BUILD_BUG_ON(sizeof(struct boot_e820_entry) != 20);
 
+	// yyf: call e820__memory_setup_default
 	who = x86_init.resources.memory_setup();
 
 	memcpy(e820_table_kexec, e820_table, sizeof(*e820_table_kexec));
@@ -1239,6 +1242,7 @@ void __init e820__memory_setup(void)
 
 	pr_info("e820: BIOS-provided physical RAM map:\n");
 	e820__print_table(who);
+	pr_info("### %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }
 
 void __init e820__memblock_setup(void)

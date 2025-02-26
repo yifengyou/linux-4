@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  Copyright (C) 1995  Linus Torvalds
  *
  *  Support of BIGMEM added by Gerhard Wichert, Siemens AG, July 1999
@@ -347,7 +347,7 @@ static void __init early_reserve_initrd(void)
 	u64 ramdisk_size  = get_ramdisk_size();
 	u64 ramdisk_end   = PAGE_ALIGN(ramdisk_image + ramdisk_size);
 
-	pr_info("yyf: Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_info("# %s File:[%s],Line:[%d]\n", __FUNCTION__, __FILE__, __LINE__);
 
 	if (!boot_params.hdr.type_of_loader ||
 	    !ramdisk_image || !ramdisk_size)
@@ -820,7 +820,7 @@ dump_kernel_offset(struct notifier_block *self, unsigned long v, void *p)
 
 void __init setup_arch(char **cmdline_p)
 {
-	pr_info("yyf: Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_info("## %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 
 	memblock_reserve(__pa_symbol(_text),
 			 (unsigned long)__bss_stop - (unsigned long)_text);
@@ -912,7 +912,7 @@ void __init setup_arch(char **cmdline_p)
 	x86_init.oem.arch_setup();
 
 	iomem_resource.end = (1ULL << boot_cpu_data.x86_phys_bits) - 1;
-	e820__memory_setup();
+	e820__memory_setup(); // yyf: e810 memory parse
 	parse_setup_data();
 
 	copy_edd();
@@ -961,7 +961,7 @@ void __init setup_arch(char **cmdline_p)
 
 	// yyf: 解析启动参数，这里是在arch中，负责架构相关的初始化设置。
 	// 此时内核已经加载到内存中，但大部分的子系统还未初始化。
-	parse_early_param(); 
+	parse_early_param(); // yyf: parse parameter
 
 	if (efi_enabled(EFI_BOOT))
 		efi_memblock_x86_reserve_range();
@@ -1279,6 +1279,8 @@ void __init setup_arch(char **cmdline_p)
 #endif
 
 	unwind_init();
+
+	pr_info("## %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }
 
 #ifdef CONFIG_X86_32
