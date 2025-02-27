@@ -34,3 +34,13 @@
 	pr_info("#### %s,File:[%s],Line:[%d]\n", __FUNCTION__, __FILE__, __LINE__);
 
 ```
+
+## add debug
+
+```
+	dump_stack();
+```
+
+
+
+

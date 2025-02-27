@@ -881,13 +881,13 @@ static int __init_or_module do_one_initcall_debug(initcall_t fn)
 	unsigned long long duration;
 	int ret;
 
-	printk(KERN_DEBUG "####### calling  %pF @ %i\n", fn, task_pid_nr(current));
+	pr_info("####### calling  %pF @ %i\n", fn, task_pid_nr(current));
 	calltime = local_clock();
 	ret = fn();
 	rettime = local_clock();
 	delta = rettime - calltime;
 	duration = delta >> 10;
-	printk(KERN_DEBUG "####### initcall %pF returned %d after %lld usecs\n",
+	pr_info("####### initcall %pF returned %d after %lld usecs\n",
 		 fn, ret, duration);
 
 	return ret;
@@ -964,11 +964,12 @@ static void __init do_initcall_level(int level)
 	initcall_t *fn;
 
 	strcpy(initcall_command_line, saved_command_line);
+	
 	parse_args(initcall_level_names[level],
 		   initcall_command_line, __start___param,
 		   __stop___param - __start___param,
 		   level, level,
-		   NULL, &repair_env_string);
+		   NULL, &repair_env_string); // yyf: 每个level都调用参数解析
 
 	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++) {
 		pr_info("######## do_initcalls_%d Call Func:%pS\n", level, *fn);
@@ -1039,7 +1040,17 @@ void __init load_default_modules(void)
 
 static int run_init_process(const char *init_filename)
 {
+	int yyf_i;
 	argv_init[0] = init_filename;
+
+	// yyf: 打印完整 argv 和 envp（必须NULL结尾）
+	for (yyf_i = 0; argv_init[yyf_i]; yyf_i++)
+	    pr_info("##### %s File:[%s],Line:[%d] argv[%d]=%s\n",
+	    __FUNCTION__, __FILE__, __LINE__, yyf_i, argv_init[yyf_i]);
+	for (yyf_i = 0; envp_init[yyf_i]; yyf_i++)
+	    pr_info("##### %s File:[%s],Line:[%d] envp[%d]=%s\n",
+	    __FUNCTION__, __FILE__, __LINE__, yyf_i, envp_init[yyf_i]);
+
 	return do_execve(getname_kernel(init_filename),
 		(const char __user *const __user *)argv_init,
 		(const char __user *const __user *)envp_init);
@@ -1135,9 +1146,10 @@ static int __ref kernel_init(void *unused)
 		       ramdisk_execute_command, ret);
 	}
 
-	
-	pr_info("#### %s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace %s!!\n",
+	pr_info("\n\n********************************************************\n\n");
+	pr_info("#### %s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace execute_command=[%s]\n",
 		__FUNCTION__, __FILE__, __LINE__, execute_command);
+	pr_info("\n\n********************************************************\n\n");
 
 	/*
 	 * We try each of these until one succeeds.
