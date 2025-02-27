@@ -373,9 +373,9 @@ asmlinkage __visible void *extract_kernel(void *rmode, memptr heap,
 
 	lines = boot_params->screen_info.orig_video_lines;
 	cols = boot_params->screen_info.orig_video_cols;
-	warn("yyf: before console_init, No parameter could pass\n");
+	warn("# before console_init, No parameter could pass\n");
 	console_init();
-	warn("yyf: earlyprintk with console_init, No parameter could pass\n");
+	warn("# earlyprintk with console_init, No parameter could pass\n");
 	debug_putstr("early console in extract_kernel\n");
 
 	if (IS_ENABLED(CONFIG_X86_5LEVEL) && !l5_supported()) {

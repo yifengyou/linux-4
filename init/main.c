@@ -1051,6 +1051,8 @@ static int run_init_process(const char *init_filename)
 	    pr_info("##### %s File:[%s],Line:[%d] envp[%d]=%s\n",
 	    __FUNCTION__, __FILE__, __LINE__, yyf_i, envp_init[yyf_i]);
 
+	pr_info("********************************************************\n");
+
 	return do_execve(getname_kernel(init_filename),
 		(const char __user *const __user *)argv_init,
 		(const char __user *const __user *)envp_init);
@@ -1135,8 +1137,11 @@ static int __ref kernel_init(void *unused)
 	rcu_end_inkernel_boot();
 
 	
-	pr_info("#### %s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace %s!!\n",
+	pr_info("********************************************************\n");
+	pr_info("#### %s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace ramdisk_execute_command=[%s]\n",
 		__FUNCTION__, __FILE__, __LINE__, ramdisk_execute_command);
+	pr_info("********************************************************\n");
+
 
 	if (ramdisk_execute_command) {
 		ret = run_init_process(ramdisk_execute_command);
@@ -1146,10 +1151,10 @@ static int __ref kernel_init(void *unused)
 		       ramdisk_execute_command, ret);
 	}
 
-	pr_info("\n\n********************************************************\n\n");
+	pr_info("\n********************************************************\n");
 	pr_info("#### %s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace execute_command=[%s]\n",
 		__FUNCTION__, __FILE__, __LINE__, execute_command);
-	pr_info("\n\n********************************************************\n\n");
+	pr_info("\n********************************************************\n");
 
 	/*
 	 * We try each of these until one succeeds.
