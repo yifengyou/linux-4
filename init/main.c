@@ -413,7 +413,7 @@ static noinline void __ref rest_init(void)
 	pr_info("### %s File:[%s],Line:[%d] no kthread created\n", __FUNCTION__, __FILE__, __LINE__);
 	yyf_count_all_threads();
 
-	rcu_scheduler_starting();
+	rcu_scheduler_starting(); // yyf: 激活rcu调度器
 	/*
 	 * We need to spawn init first so that it obtains pid 1, however
 	 * the init task will end up wanting to create kthreads, which, if
@@ -461,9 +461,9 @@ static noinline void __ref rest_init(void)
 	 * The boot idle thread must execute schedule()
 	 * at least once to get things moving:
 	 */
-	schedule_preempt_disabled();
+	schedule_preempt_disabled(); // yyf: 禁用抢占
 	/* Call into cpu_idle with preempt disabled */
-	cpu_startup_entry(CPUHP_ONLINE);
+	cpu_startup_entry(CPUHP_ONLINE); // yyf: 0号进程进入do_idle()循环
 }
 
 /* Check for early params. */
@@ -778,15 +778,17 @@ asmlinkage __visible void __init start_kernel(void)
 		efi_free_boot_services();
 	}
 
-	// while(1);
-	pr_info("# %s File:[%s],Line:[%d] Enable multi ps!!!\n", __FUNCTION__, __FILE__, __LINE__);
-
 	/* Do the rest non-__init'ed, we're now alive */
-	rest_init();
+	rest_init(); // yyf: 其余init任务，创建1号进程和2号进程
+	// yyf: 0号进程，也就是swapper转为空闲进程(idle进程)，进入无限循环
+	// idle无限循环不会结束，函数不会返回 cpu_idle_loop()
 
-	prevent_tail_call_optimization();
+	prevent_tail_call_optimization(); // yyf: 不会被执行
 
-	
+	// rest_init() 是内核从初始化阶段过渡到用户空间的最终步骤。
+	// 由于它通过调度机制将执行流永久转移到空闲循环，
+	// start_kernel() 中 rest_init() 之后的代码在正常启动流程中不会执行。
+	// 这一设计确保了内核启动逻辑的完整性和资源的高效利用
 	pr_info("# %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }
 
@@ -879,13 +881,13 @@ static int __init_or_module do_one_initcall_debug(initcall_t fn)
 	unsigned long long duration;
 	int ret;
 
-	printk(KERN_DEBUG "#### calling  %pF @ %i\n", fn, task_pid_nr(current));
+	printk(KERN_DEBUG "####### calling  %pF @ %i\n", fn, task_pid_nr(current));
 	calltime = local_clock();
 	ret = fn();
 	rettime = local_clock();
 	delta = rettime - calltime;
 	duration = delta >> 10;
-	printk(KERN_DEBUG "#### initcall %pF returned %d after %lld usecs\n",
+	printk(KERN_DEBUG "####### initcall %pF returned %d after %lld usecs\n",
 		 fn, ret, duration);
 
 	return ret;
@@ -969,7 +971,7 @@ static void __init do_initcall_level(int level)
 		   NULL, &repair_env_string);
 
 	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++) {
-		pr_info("### do_initcalls_%d Call Func:%pS\n", level, *fn);
+		pr_info("######## do_initcalls_%d Call Func:%pS\n", level, *fn);
 		do_one_initcall(*fn);
 	}
 }
@@ -978,20 +980,18 @@ static void __init do_initcalls(void)
 {
 	// 调用initcall机制0-7段区间的函数
 	int level;
-	
-	pr_info("# do_initcalls begin!! Func:%s,File:[%s],Line:[%d]\n",
-			__FUNCTION__, __FILE__, __LINE__);
+
+	pr_info("###### %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 
 	for (level = 0; level < ARRAY_SIZE(initcall_levels) - 1; level++) {
-		pr_info("## do_initcalls_%d begin !! Func:%s,File:[%s],Line:[%d]\n",
+		pr_info("####### do_initcalls_%d begin !! Func:%s,File:[%s],Line:[%d]\n",
 				level, __FUNCTION__, __FILE__, __LINE__);
 		do_initcall_level(level);
-		pr_info("## do_initcalls_%d finished !! Func:%s,File:[%s],Line:[%d]\n",
+		pr_info("####### do_initcalls_%d finished !! Func:%s,File:[%s],Line:[%d]\n",
 				level, __FUNCTION__, __FILE__, __LINE__);
 	}
 	
-	pr_info("# do_initcalls finished!! Func:%s,File:[%s],Line:[%d]\n",
-			__FUNCTION__, __FILE__, __LINE__);
+	pr_info("###### %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }
 
 /*
@@ -1003,6 +1003,7 @@ static void __init do_initcalls(void)
  */
 static void __init do_basic_setup(void)
 {
+
 	cpuset_init_smp();
 	shmem_init();
 	driver_init();
@@ -1017,14 +1018,12 @@ static void __init do_pre_smp_initcalls(void)
 	// 调用initcall机制的early段区间的函数
 	initcall_t *fn;
 	
-	pr_info("# do_pre_smp_initcalls begin!! Func:%s,File:[%s],Line:[%d]\n",
-			__FUNCTION__, __FILE__, __LINE__);
+	pr_info("###### %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 	for (fn = __initcall_start; fn < __initcall0_start; fn++) {
-		pr_info("## do_pre_smp_initcalls do_initcalls_early call %pS\n", *fn);
+		pr_info("###### %s File:[%s],Line:[%d] do_initcalls_early call %pS\n", __FUNCTION__, __FILE__, __LINE__, *fn);
 		do_one_initcall(*fn);
 	}
-	pr_info("# do_pre_smp_initcalls finished!! Func:%s,File:[%s],Line:[%d]\n",
-			__FUNCTION__, __FILE__, __LINE__);
+	pr_info("###### %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }
 
 /*
@@ -1103,7 +1102,10 @@ static int __ref kernel_init(void *unused)
 	pr_info("#### %s File:[%s],Line:[%d] kthread 1 kernel_init running!!\n",
 		__FUNCTION__, __FILE__, __LINE__);
 
-	kernel_init_freeable();
+	kernel_init_freeable(); // yyf: 内核启动阶段，自由化=解除约束
+	// yyf: 解除SMP约束、解除动态加载模块约束、解除静态限制
+
+	
 	/* need to finish all async __init code before freeing the memory */
 	async_synchronize_full();
 	ftrace_free_init_mem();
@@ -1170,6 +1172,7 @@ static noinline void __init kernel_init_freeable(void)
 	/*
 	 * Wait until kthreadd is all set-up.
 	 */
+	pr_info("##### %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 	wait_for_completion(&kthreadd_done);
 
 	/* Now the scheduler is fully set up and can do blocking allocations */
@@ -1188,7 +1191,7 @@ static noinline void __init kernel_init_freeable(void)
 
 	init_mm_internals();
 
-	do_pre_smp_initcalls();
+	do_pre_smp_initcalls(); // yyf: 调用initcall机制的early段的函数
 	lockup_detector_init();
 
 	smp_init();
@@ -1198,7 +1201,7 @@ static noinline void __init kernel_init_freeable(void)
 	/* Initialize page ext after all struct pages are initialized. */
 	page_ext_init();
 
-	do_basic_setup();
+	do_basic_setup(); // yyf: 调用initcall机制的0-7段的函数
 
 	/* Open the /dev/console on the rootfs, this should never fail */
 	if (sys_open((const char __user *) "/dev/console", O_RDWR, 0) < 0)
@@ -1230,4 +1233,5 @@ static noinline void __init kernel_init_freeable(void)
 
 	integrity_load_keys();
 	load_default_modules();
+	pr_info("##### %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }

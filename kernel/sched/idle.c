@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Generic entry point for the idle threads
  */
 #include <linux/sched.h>
@@ -347,6 +347,8 @@ void cpu_startup_entry(enum cpuhp_state state)
 #endif
 	arch_cpu_idle_prepare();
 	cpuhp_online_idle(state);
+
+	pr_info("#### %s File:[%s],Line:[%d] 0 thread loop do_idle()\n", __FUNCTION__, __FILE__, __LINE__);
 	while (1)
 		do_idle();
 }
