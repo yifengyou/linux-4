@@ -591,6 +591,8 @@ dotraplinkage void notrace do_int3(struct pt_regs *regs, long error_code)
 	if (poke_int3_handler(regs))
 		return;
 
+	pr_info("# %s File:[%s],Line:[%d] kgdb\n", __FUNCTION__, __FILE__, __LINE__);
+
 	/*
 	 * Use ist_enter despite the fact that we don't use an IST stack.
 	 * We can be called from a kprobe in non-CONTEXT_KERNEL kernel

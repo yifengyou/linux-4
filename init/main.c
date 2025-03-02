@@ -548,7 +548,9 @@ asmlinkage __visible void __init start_kernel(void)
 {
 	char *command_line;
 	char *after_dashes;
-	pr_info("# %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
+
+	dump_stack();
+	pr_info("# %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__);
 	
 	pr_info("# %s File:[%s],Line:[%d] enable early printk\n", __FUNCTION__, __FILE__, __LINE__);
 
@@ -881,7 +883,7 @@ static int __init_or_module do_one_initcall_debug(initcall_t fn)
 	unsigned long long duration;
 	int ret;
 
-	pr_info("####### calling  %pF @ %i\n", fn, task_pid_nr(current));
+	pr_info("####### calling  %pF @ %i [0x%px]\n", fn, task_pid_nr(current), (void *)fn);
 	calltime = local_clock();
 	ret = fn();
 	rettime = local_clock();

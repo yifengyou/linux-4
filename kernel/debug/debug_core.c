@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Kernel Debug Core
  *
  * Maintainer: Jason Wessel <jason.wessel@windriver.com>
@@ -698,6 +698,9 @@ kgdb_handle_exception(int evector, int signo, int ecode, struct pt_regs *regs)
 	struct kgdb_state *ks = &kgdb_var;
 	int ret = 0;
 
+	pr_info("# %s File:[%s],Line:[%d] evector=[%d],signo=[%d],ecode=[%d] main entry point for kgdb\n",
+		__FUNCTION__, __FILE__, __LINE__, evector, signo, ecode);
+
 	if (arch_kgdb_ops.enable_nmi)
 		arch_kgdb_ops.enable_nmi(0);
 	/*
@@ -987,7 +990,7 @@ static void kgdb_initial_breakpoint(void)
 {
 	kgdb_break_asap = 0;
 
-	dump_stack();
+	// dump_stack();
 	pr_crit("Waiting for connection from remote gdb...\n");
 	kgdb_breakpoint();
 }
@@ -1088,6 +1091,12 @@ noinline void kgdb_breakpoint(void)
 	atomic_inc(&kgdb_setting_breakpoint);
 	wmb(); /* Sync point before breakpoint */
 	arch_kgdb_breakpoint();
+	/*
+		yyf: ​这是实际触发断点的关键步骤，具体实现依赖 CPU 架构：
+		​x86：执行 int3 指令（机器码 0xCC），触发断点异常。
+		​ARM：可能使用 BRK 指令。
+		执行这条指令后，CPU 会暂停当前程序，将控制权交给调试器（如 KGDB）。
+	*/
 	wmb(); /* Sync point after breakpoint */
 	atomic_dec(&kgdb_setting_breakpoint);
 }
@@ -1098,9 +1107,11 @@ static int __init opt_kgdb_wait(char *str)
 	kgdb_break_asap = 1;
 
 	kdb_init(KDB_INIT_EARLY);
-	pr_info("yyf: kgdb_io_module_registered=%d\n", kgdb_io_module_registered);
+	pr_info("###### %s File:[%s],Line:[%d] early_param kgdb_io_module_registered=%d\n",
+		__FUNCTION__, __FILE__, __LINE__, kgdb_io_module_registered);
 	if (kgdb_io_module_registered) {
-		pr_info("yyf: call kgdb_initial_breakpoint in opt_kgdb_wait\n");
+		pr_info("###### %s File:[%s],Line:[%d] early_param call kgdb_initial_breakpoint in opt_kgdb_wait\n",
+		__FUNCTION__, __FILE__, __LINE__);
 		kgdb_initial_breakpoint();
 	}
 

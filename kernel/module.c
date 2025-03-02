@@ -3491,8 +3491,12 @@ static noinline int do_init_module(struct module *mod)
 
 	do_mod_ctors(mod);
 	/* Start the module */
-	if (mod->init != NULL)
+	if (mod->init != NULL) {
+		if (mod->name != NULL)
+				pr_info("###### %s File:[%s],Line:[%d] load ko module [%s]\n",
+					__FUNCTION__, __FILE__, __LINE__, mod->name);
 		ret = do_one_initcall(mod->init);
+	}
 	if (ret < 0) {
 		goto fail_free_freeinit;
 	}
