@@ -750,7 +750,7 @@ static struct smp_hotplug_thread softirq_threads = {
 
 static __init int spawn_ksoftirqd(void)
 {
-	pr_info("######## early_initcall(spawn_ksoftirqd); Func:[%s],File:[%s],Line:[%d]\n",
+	pr_kdev("%s File:[%s],Line:[%d] early_initcall(spawn_ksoftirqd)\n",
 				__FUNCTION__, __FILE__, __LINE__);
 	// dump_stack();
 	cpuhp_setup_state_nocalls(CPUHP_SOFTIRQ_DEAD, "softirq:dead", NULL,

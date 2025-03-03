@@ -396,7 +396,7 @@ void yyf_count_all_threads(void)
 	for_each_process(p)
 		kthread_count++;
 
-	pr_info("#### current total thread num is [%d]\n", kthread_count);
+	pr_kdev("current total thread num is [%d]\n", kthread_count);
 }
 
 
@@ -405,12 +405,12 @@ static noinline void __ref rest_init(void)
 	struct task_struct *tsk;
 	int pid;
 
-	pr_info("## %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 
 
 	// yyf: show current thread num
 	
-	pr_info("### %s File:[%s],Line:[%d] no kthread created\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] no kthread created\n", __FUNCTION__, __FILE__, __LINE__);
 	yyf_count_all_threads();
 
 	rcu_scheduler_starting(); // yyf: 激活rcu调度器
@@ -422,7 +422,7 @@ static noinline void __ref rest_init(void)
 	pid = kernel_thread(kernel_init, NULL, CLONE_FS);
 
 	// yyf: show current thread num
-	pr_info("### %s File:[%s],Line:[%d] new thread kernel_init\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] new thread kernel_init\n", __FUNCTION__, __FILE__, __LINE__);
 	yyf_count_all_threads();
 	
 
@@ -443,7 +443,7 @@ static noinline void __ref rest_init(void)
 	rcu_read_unlock();
 
 	// yyf: show current thread num
-	pr_info("### %s File:[%s],Line:[%d] new thread kthreadd\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] new thread kthreadd\n", __FUNCTION__, __FILE__, __LINE__);
 	yyf_count_all_threads();
 
 	/*
@@ -497,7 +497,7 @@ void __init parse_early_param(void)
 	static int done __initdata;
 	static char tmp_cmdline[COMMAND_LINE_SIZE] __initdata;
 	
-	pr_info("### %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 
 	if (done)
 		return;
@@ -506,7 +506,7 @@ void __init parse_early_param(void)
 	strlcpy(tmp_cmdline, boot_command_line, COMMAND_LINE_SIZE);
 	parse_early_options(tmp_cmdline);
 	done = 1;
-	pr_info("### %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }
 
 void __init __weak arch_post_acpi_subsys_init(void) { }
@@ -684,30 +684,30 @@ asmlinkage __visible void __init start_kernel(void)
 	console_init();
 	
 	pr_info("\n\n*********************************************************\n\n");
-	pr_info("# %s File:[%s],Line:[%d] disable early printk\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] disable early printk\n", __FUNCTION__, __FILE__, __LINE__);
 
 	
 	if (panic_later)
 		panic("Too many boot %s vars at `%s'", panic_later,
 		      panic_param);
 
-	pr_info("# %s File:[%s],Line:[%d] printk test begin\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] printk test begin\n", __FUNCTION__, __FILE__, __LINE__);
 	
-	pr_info("## %s File:[%s],Line:[%d] console_loglevel=[%d]\n", __FUNCTION__, __FILE__, __LINE__, console_loglevel);
-	pr_info("## %s File:[%s],Line:[%d] default_message_loglevel=[%d]\n", __FUNCTION__, __FILE__, __LINE__, default_message_loglevel);
-	pr_info("## %s File:[%s],Line:[%d] minimum_console_loglevel=[%d]\n", __FUNCTION__, __FILE__, __LINE__, minimum_console_loglevel);
-	pr_info("## %s File:[%s],Line:[%d] default_console_loglevel=[%d]\n", __FUNCTION__, __FILE__, __LINE__, default_console_loglevel);
+	pr_kdev("%s File:[%s],Line:[%d] console_loglevel=[%d]\n", __FUNCTION__, __FILE__, __LINE__, console_loglevel);
+	pr_kdev("%s File:[%s],Line:[%d] default_message_loglevel=[%d]\n", __FUNCTION__, __FILE__, __LINE__, default_message_loglevel);
+	pr_kdev("%s File:[%s],Line:[%d] minimum_console_loglevel=[%d]\n", __FUNCTION__, __FILE__, __LINE__, minimum_console_loglevel);
+	pr_kdev("%s File:[%s],Line:[%d] default_console_loglevel=[%d]\n", __FUNCTION__, __FILE__, __LINE__, default_console_loglevel);
 	
-	pr_emerg("## %s File:[%s],Line:[%d] this is pr_emerg   (level: 0)\n", __FUNCTION__, __FILE__, __LINE__);
-	pr_alert("## %s File:[%s],Line:[%d] this is pr_alert   (level: 1)\n", __FUNCTION__, __FILE__, __LINE__);
-	pr_crit("## %s File:[%s],Line:[%d] this is pr_crit    (level: 2)\n", __FUNCTION__, __FILE__, __LINE__);
-	pr_err("## %s File:[%s],Line:[%d] this is pr_err     (level: 3)\n", __FUNCTION__, __FILE__, __LINE__);
-	pr_warning("## %s File:[%s],Line:[%d] this is pr_warning (level: 4)\n", __FUNCTION__, __FILE__, __LINE__);
-	pr_warn("## %s File:[%s],Line:[%d] this is pr_warn    (level: 5)\n", __FUNCTION__, __FILE__, __LINE__);
-	pr_notice("## %s File:[%s],Line:[%d] this is pr_notice  (level: 6)\n", __FUNCTION__, __FILE__, __LINE__);
-	pr_info("## %s File:[%s],Line:[%d] this is pr_info    (level: 7)\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_emerg("%s File:[%s],Line:[%d] this is pr_emerg   (level: 0)\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_alert("%s File:[%s],Line:[%d] this is pr_alert   (level: 1)\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_crit("%s File:[%s],Line:[%d] this is pr_crit    (level: 2)\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_err("%s File:[%s],Line:[%d] this is pr_err     (level: 3)\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_warning("%s File:[%s],Line:[%d] this is pr_warning (level: 4)\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_warn("%s File:[%s],Line:[%d] this is pr_warn    (level: 5)\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_notice("%s File:[%s],Line:[%d] this is pr_notice  (level: 6)\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_info("%s File:[%s],Line:[%d] this is pr_info    (level: 7)\n", __FUNCTION__, __FILE__, __LINE__);
 	
-	pr_info("# %s File:[%s],Line:[%d] printk test finished\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] printk test finished\n", __FUNCTION__, __FILE__, __LINE__);
 
 	lockdep_info();
 
@@ -791,7 +791,7 @@ asmlinkage __visible void __init start_kernel(void)
 	// 由于它通过调度机制将执行流永久转移到空闲循环，
 	// start_kernel() 中 rest_init() 之后的代码在正常启动流程中不会执行。
 	// 这一设计确保了内核启动逻辑的完整性和资源的高效利用
-	pr_info("# %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }
 
 /* Call all constructor functions linked into the kernel. */
@@ -883,13 +883,13 @@ static int __init_or_module do_one_initcall_debug(initcall_t fn)
 	unsigned long long duration;
 	int ret;
 
-	pr_info("####### calling  %pF @ %i [0x%px]\n", fn, task_pid_nr(current), (void *)fn);
+	pr_kdev("calling  %pF @ %i [0x%px]\n", fn, task_pid_nr(current), (void *)fn);
 	calltime = local_clock();
 	ret = fn();
 	rettime = local_clock();
 	delta = rettime - calltime;
 	duration = delta >> 10;
-	pr_info("####### initcall %pF returned %d after %lld usecs\n",
+	pr_kdev("initcall %pF returned %d after %lld usecs\n",
 		 fn, ret, duration);
 
 	return ret;
@@ -974,7 +974,7 @@ static void __init do_initcall_level(int level)
 		   NULL, &repair_env_string); // yyf: 每个level都调用参数解析
 
 	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++) {
-		pr_info("######## do_initcalls_%d Call Func:%pS\n", level, *fn);
+		pr_kdev("do_initcalls_%d Call Func:%pS\n", level, *fn);
 		do_one_initcall(*fn);
 	}
 }
@@ -984,17 +984,17 @@ static void __init do_initcalls(void)
 	// 调用initcall机制0-7段区间的函数
 	int level;
 
-	pr_info("###### %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 
 	for (level = 0; level < ARRAY_SIZE(initcall_levels) - 1; level++) {
-		pr_info("####### do_initcalls_%d begin !! Func:%s,File:[%s],Line:[%d]\n",
+		pr_kdev("do_initcalls_%d begin !! Func:%s,File:[%s],Line:[%d]\n",
 				level, __FUNCTION__, __FILE__, __LINE__);
 		do_initcall_level(level);
-		pr_info("####### do_initcalls_%d finished !! Func:%s,File:[%s],Line:[%d]\n",
+		pr_kdev("do_initcalls_%d finished !! Func:%s,File:[%s],Line:[%d]\n",
 				level, __FUNCTION__, __FILE__, __LINE__);
 	}
 	
-	pr_info("###### %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }
 
 /*
@@ -1021,12 +1021,12 @@ static void __init do_pre_smp_initcalls(void)
 	// 调用initcall机制的early段区间的函数
 	initcall_t *fn;
 	
-	pr_info("###### %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 	for (fn = __initcall_start; fn < __initcall0_start; fn++) {
-		pr_info("###### %s File:[%s],Line:[%d] do_initcalls_early call %pS\n", __FUNCTION__, __FILE__, __LINE__, *fn);
+		pr_kdev("%s File:[%s],Line:[%d] do_initcalls_early call %pS\n", __FUNCTION__, __FILE__, __LINE__, *fn);
 		do_one_initcall(*fn);
 	}
-	pr_info("###### %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }
 
 /*
@@ -1047,10 +1047,10 @@ static int run_init_process(const char *init_filename)
 
 	// yyf: 打印完整 argv 和 envp（必须NULL结尾）
 	for (yyf_i = 0; argv_init[yyf_i]; yyf_i++)
-	    pr_info("##### %s File:[%s],Line:[%d] argv[%d]=%s\n",
+	    pr_kdev("%s File:[%s],Line:[%d] argv[%d]=%s\n",
 	    __FUNCTION__, __FILE__, __LINE__, yyf_i, argv_init[yyf_i]);
 	for (yyf_i = 0; envp_init[yyf_i]; yyf_i++)
-	    pr_info("##### %s File:[%s],Line:[%d] envp[%d]=%s\n",
+	    pr_kdev("%s File:[%s],Line:[%d] envp[%d]=%s\n",
 	    __FUNCTION__, __FILE__, __LINE__, yyf_i, envp_init[yyf_i]);
 
 	pr_info("********************************************************\n");
@@ -1114,7 +1114,7 @@ static int __ref kernel_init(void *unused)
 {
 	int ret;
 
-	pr_info("#### %s File:[%s],Line:[%d] kthread 1 kernel_init running!!\n",
+	pr_kdev("%s File:[%s],Line:[%d] kthread 1 kernel_init running!!\n",
 		__FUNCTION__, __FILE__, __LINE__);
 
 	kernel_init_freeable(); // yyf: 内核启动阶段，自由化=解除约束
@@ -1140,7 +1140,7 @@ static int __ref kernel_init(void *unused)
 
 	
 	pr_info("********************************************************\n");
-	pr_info("#### %s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace ramdisk_execute_command=[%s]\n",
+	pr_kdev("%s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace ramdisk_execute_command=[%s]\n",
 		__FUNCTION__, __FILE__, __LINE__, ramdisk_execute_command);
 	pr_info("********************************************************\n");
 
@@ -1154,7 +1154,7 @@ static int __ref kernel_init(void *unused)
 	}
 
 	pr_info("\n********************************************************\n");
-	pr_info("#### %s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace execute_command=[%s]\n",
+	pr_kdev("%s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace execute_command=[%s]\n",
 		__FUNCTION__, __FILE__, __LINE__, execute_command);
 	pr_info("\n********************************************************\n");
 
@@ -1173,7 +1173,7 @@ static int __ref kernel_init(void *unused)
 	}
 
 	
-	pr_info("#### %s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace!!\n",
+	pr_kdev("%s File:[%s],Line:[%d] kthread 1 kernel_init enter userspace!!\n",
 		__FUNCTION__, __FILE__, __LINE__);
 	
 	if (!try_to_run_init_process("/sbin/init") ||
@@ -1191,7 +1191,7 @@ static noinline void __init kernel_init_freeable(void)
 	/*
 	 * Wait until kthreadd is all set-up.
 	 */
-	pr_info("##### %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 	wait_for_completion(&kthreadd_done);
 
 	/* Now the scheduler is fully set up and can do blocking allocations */
@@ -1252,5 +1252,5 @@ static noinline void __init kernel_init_freeable(void)
 
 	integrity_load_keys();
 	load_default_modules();
-	pr_info("##### %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }

@@ -698,7 +698,7 @@ kgdb_handle_exception(int evector, int signo, int ecode, struct pt_regs *regs)
 	struct kgdb_state *ks = &kgdb_var;
 	int ret = 0;
 
-	pr_info("# %s File:[%s],Line:[%d] evector=[%d],signo=[%d],ecode=[%d] main entry point for kgdb\n",
+	pr_kdev("%s File:[%s],Line:[%d] evector=[%d],signo=[%d],ecode=[%d] main entry point for kgdb\n",
 		__FUNCTION__, __FILE__, __LINE__, evector, signo, ecode);
 
 	if (arch_kgdb_ops.enable_nmi)
@@ -1107,10 +1107,10 @@ static int __init opt_kgdb_wait(char *str)
 	kgdb_break_asap = 1;
 
 	kdb_init(KDB_INIT_EARLY);
-	pr_info("###### %s File:[%s],Line:[%d] early_param kgdb_io_module_registered=%d\n",
+	pr_kdev("%s File:[%s],Line:[%d] early_param kgdb_io_module_registered=%d\n",
 		__FUNCTION__, __FILE__, __LINE__, kgdb_io_module_registered);
 	if (kgdb_io_module_registered) {
-		pr_info("###### %s File:[%s],Line:[%d] early_param call kgdb_initial_breakpoint in opt_kgdb_wait\n",
+		pr_kdev("%s File:[%s],Line:[%d] early_param call kgdb_initial_breakpoint in opt_kgdb_wait\n",
 		__FUNCTION__, __FILE__, __LINE__);
 		kgdb_initial_breakpoint();
 	}

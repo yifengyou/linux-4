@@ -347,7 +347,7 @@ static void __init early_reserve_initrd(void)
 	u64 ramdisk_size  = get_ramdisk_size();
 	u64 ramdisk_end   = PAGE_ALIGN(ramdisk_image + ramdisk_size);
 
-	pr_info("### %s File:[%s],Line:[%d]\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d]\n", __FUNCTION__, __FILE__, __LINE__);
 
 	if (!boot_params.hdr.type_of_loader ||
 	    !ramdisk_image || !ramdisk_size)
@@ -820,7 +820,7 @@ dump_kernel_offset(struct notifier_block *self, unsigned long v, void *p)
 
 void __init setup_arch(char **cmdline_p)
 {
-	pr_info("## %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 
 	memblock_reserve(__pa_symbol(_text),
 			 (unsigned long)__bss_stop - (unsigned long)_text);
@@ -1280,7 +1280,7 @@ void __init setup_arch(char **cmdline_p)
 
 	unwind_init();
 
-	pr_info("## %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("## %s File:[%s],Line:[%d] finished\n", __FUNCTION__, __FILE__, __LINE__);
 }
 
 #ifdef CONFIG_X86_32

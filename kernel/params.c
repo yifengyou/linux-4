@@ -192,7 +192,7 @@ char *parse_args(const char *doing,
 		int irq_was_disabled;
 
 		args = next_arg(args, &param, &val);
-		pr_info("#### %s File:[%s],Line:[%d] param:[%s] value:[%s]\n",
+		pr_kdev("%s File:[%s],Line:[%d] param:[%s] value:[%s]\n",
 			__FUNCTION__, __FILE__, __LINE__, param, val);
 		/* Stop at -- */
 		if (!val && strcmp(param, "--") == 0)

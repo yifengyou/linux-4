@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright (C) 2002 Richard Henderson
    Copyright (C) 2001 Rusty Russell, 2002, 2010 Rusty Russell IBM.
 
@@ -3493,8 +3493,8 @@ static noinline int do_init_module(struct module *mod)
 	/* Start the module */
 	if (mod->init != NULL) {
 		if (mod->name != NULL)
-				pr_info("###### %s File:[%s],Line:[%d] load ko module [%s]\n",
-					__FUNCTION__, __FILE__, __LINE__, mod->name);
+				pr_kdev("%s File:[%s],Line:[%d] load ko module [%s](%i)\n",
+					__FUNCTION__, __FILE__, __LINE__, mod->name, task_pid_nr(current));
 		ret = do_one_initcall(mod->init);
 	}
 	if (ret < 0) {
