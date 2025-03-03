@@ -2052,7 +2052,7 @@ asmlinkage __visible int kdev_printk(const char *fmt, ...)
 	prefix[depth] = '\0'; // 确保字符串终止
 
 	// 合并前缀和原始格式字符串
-	snprintf(new_fmt, sizeof(new_fmt), KERN_INFO "%s %s", prefix, fmt);
+	snprintf(new_fmt, sizeof(new_fmt), KERN_INFO "%s (@%i)%s", prefix, task_pid_nr(current), fmt);
 
 	// 使用新格式字符串处理可变参数
 	va_start(args, fmt);
