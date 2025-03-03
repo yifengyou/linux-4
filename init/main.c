@@ -548,11 +548,11 @@ asmlinkage __visible void __init start_kernel(void)
 {
 	char *command_line;
 	char *after_dashes;
+	int depth = kdev_get_stack_depth();
 
 	dump_stack();
-	pr_info("# %s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__);
-	
-	pr_info("# %s File:[%s],Line:[%d] enable early printk\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_kdev("%s File:[%s],Line:[%d] start depth=[%d]\n", __FUNCTION__, __FILE__, __LINE__, depth);
+	pr_kdev("%s File:[%s],Line:[%d] enable early printk\n", __FUNCTION__, __FILE__, __LINE__);
 
 	set_task_stack_end_magic(&init_task);
 	smp_setup_processor_id();

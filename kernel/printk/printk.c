@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  linux/kernel/printk.c
  *
  *  Copyright (C) 1991, 1992  Linus Torvalds
@@ -2007,6 +2007,64 @@ asmlinkage __visible int printk(const char *fmt, ...)
 	return r;
 }
 EXPORT_SYMBOL(printk);
+
+
+
+/**
+ * kdev_printk - kdev print a kernel message
+ * @fmt: format string
+ *
+ * This is printk(). It can be called from any context. We want it to work.
+ *
+ * We try to grab the console_lock. If we succeed, it's easy - we log the
+ * output and call the console drivers.  If we fail to get the semaphore, we
+ * place the output into the log buffer and return. The current holder of
+ * the console_sem will notice the new output in console_unlock(); and will
+ * send it to the consoles before releasing the lock.
+ *
+ * One effect of this deferred printing is that code which calls printk() and
+ * then changes console_loglevel may break. This is because console_loglevel
+ * is inspected when the actual printing occurs.
+ *
+ * See also:
+ * printf(3)
+ *
+ * See the vsnprintf() documentation for format string extensions over C99.
+ */
+asmlinkage __visible int kdev_printk(const char *fmt, ...)
+{
+	va_list args;
+	int r;
+	int depth;
+	char prefix[128];   // 假设最大深度为 128
+	char new_fmt[LOG_LINE_MAX]; // 合并后的格式字符串缓冲区 LOG_LINE_MAX
+
+	// 获取当前栈深度并确保非负
+	depth = kdev_get_stack_depth() -1;
+	depth = depth < 0 ? 0 : depth;
+
+	// 限制深度不超过prefix缓冲区大小
+	if (depth > sizeof(prefix) - 1)
+		depth = sizeof(prefix) - 1;
+
+	// 生成对应数量的'#'字符串
+	memset(prefix, '#', depth);
+	prefix[depth] = '\0'; // 确保字符串终止
+
+	// 合并前缀和原始格式字符串
+	snprintf(new_fmt, sizeof(new_fmt), KERN_INFO "%s %s", prefix, fmt);
+
+	// 使用新格式字符串处理可变参数
+	va_start(args, fmt);
+	r = vprintk_func(new_fmt, args);
+	va_end(args);
+
+	return r;
+
+}
+EXPORT_SYMBOL(kdev_printk);
+
+
 
 #else /* CONFIG_PRINTK */
 

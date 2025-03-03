@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  Copyright (C) 1991, 1992  Linus Torvalds
  *  Copyright (C) 2000, 2001, 2002 Andi Kleen, SuSE Labs
  */
@@ -103,6 +103,38 @@ static void show_regs_if_on_stack(struct stack_info *info, struct pt_regs *regs,
 	}
 }
 
+int kdev_get_task_stack_path(struct task_struct *task, struct pt_regs *regs,
+                    unsigned long *stack, char *log_lvl)
+{
+	struct unwind_state state;
+	struct stack_info stack_info = {0};
+	unsigned long visit_mask = 0;
+	int depth = 0; // 新增：调用深度计数器
+
+	unwind_start(&state, task, regs, stack);
+	stack = stack ? : get_stack_pointer(task, regs);
+	regs = unwind_get_entry_regs(&state, NULL); // 初始寄存器状态
+
+	// 遍历所有堆栈帧
+	for (; stack; stack = PTR_ALIGN(stack_info.next_sp, sizeof(long))) {
+	    if (get_stack_info(stack, task, &stack_info, &visit_mask))
+	        break;
+
+	    // 核心逻辑：每成功解开一个堆栈帧，深度+1
+	    while (1) {
+	        unsigned long *ret_addr_p = unwind_get_return_address_ptr(&state);
+	        if (!ret_addr_p) break; // 无法继续解开时终止
+
+	        depth++; // 增加深度
+	        if (unwind_next_frame(&state) < 0) // 尝试解开下一帧
+	            break;
+	    }
+	}
+
+	return depth;
+}
+
+
 void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 			unsigned long *stack, char *log_lvl)
 {
@@ -136,6 +168,7 @@ void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 	 */
 	for ( ; stack; stack = PTR_ALIGN(stack_info.next_sp, sizeof(long))) {
 		const char *stack_name;
+		
 
 		if (get_stack_info(stack, task, &stack_info, &visit_mask)) {
 			/*
@@ -221,6 +254,21 @@ next:
 		if (stack_name)
 			printk("%s </%s>\n", log_lvl, stack_name);
 	}
+}
+
+// yyf: get stack depth			
+int do_kdev_get_stack_depth(struct task_struct *task, unsigned long *sp)
+{
+	task = task ? : current;
+
+	/*
+	 * Stack frames below this one aren't interesting.  Don't show them
+	 * if we're printing for %current.
+	 */
+	if (!sp && task == current)
+		sp = get_stack_pointer(current, NULL);
+
+	return kdev_get_task_stack_path(task, NULL, sp, KERN_DEFAULT);
 }
 
 void show_stack(struct task_struct *task, unsigned long *sp)
