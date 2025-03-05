@@ -2052,7 +2052,7 @@ asmlinkage __visible int kdev_printk(const char *fmt, ...)
 	prefix[depth] = '\0'; // 确保字符串终止
 
 	// 合并前缀和原始格式字符串
-	snprintf(new_fmt, sizeof(new_fmt), KERN_INFO "%s (@%i)%s", prefix, task_pid_nr(current), fmt);
+	snprintf(new_fmt, sizeof(new_fmt), KERN_INFO "%s (@%i) %s", prefix, task_pid_nr(current), fmt);
 
 	// 使用新格式字符串处理可变参数
 	va_start(args, fmt);
@@ -3385,6 +3385,16 @@ void dump_stack_print_info(const char *log_lvl)
 	       print_tainted(), init_utsname()->release,
 	       (int)strcspn(init_utsname()->version, " "),
 	       init_utsname()->version);
+	pr_kdev("LogLevel:[%s] CPU:[%d] PID:[%d] Comm:[%.20s] IsTainted:[%s] Release:[%s] Version:[%.*s]\n",
+	       log_lvl,
+	       raw_smp_processor_id(),
+	       current->pid,
+	       current->comm,
+	       print_tainted(),
+	       init_utsname()->release,
+	       (int)strcspn(init_utsname()->version, " "), // 对应 %.*s 的长度参数
+	       init_utsname()->version
+	       );
 
 	if (dump_stack_arch_desc_str[0] != '\0')
 		printk("%sHardware name: %s\n",

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+﻿// SPDX-License-Identifier: GPL-2.0
 /*
  * kaslr.c
  *
@@ -721,6 +721,7 @@ void choose_random_location(unsigned long input,
 {
 	unsigned long random_addr, min_addr;
 
+	warn("[    0.000000] # choose_random_location check nokaslr cmdline [arch/x86/boot/compressed/kaslr.c]");
 	if (cmdline_find_option_bool("nokaslr")) {
 		warn("KASLR disabled: 'nokaslr' on cmdline.");
 		return;

@@ -146,9 +146,9 @@ void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 
 	printk("%sCall Trace:\n", log_lvl);
 
-	unwind_start(&state, task, regs, stack);
-	stack = stack ? : get_stack_pointer(task, regs);
-	regs = unwind_get_entry_regs(&state, &partial);
+	unwind_start(&state, task, regs, stack); // yyf: 初始化展开状态
+	stack = stack ? : get_stack_pointer(task, regs); // yyf: 如果 stack 为空，通过 get_stack_pointer 获取任务堆栈指针
+	regs = unwind_get_entry_regs(&state, &partial); // yyf: 获取当前帧的寄存器信息，partial 标记是否完整
 
 	/*
 	 * Iterate through the stacks, starting with the current stack pointer.
@@ -166,7 +166,7 @@ void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 	 * - hardirq stack
 	 * - entry stack
 	 */
-	for ( ; stack; stack = PTR_ALIGN(stack_info.next_sp, sizeof(long))) {
+	for ( ; stack; stack = PTR_ALIGN(stack_info.next_sp, sizeof(long))) { // yyf: 遍历所有可能的堆栈（任务栈、中断栈、异常栈等）,PTR_ALIGN 确保下一栈指针按 long 对齐
 		const char *stack_name;
 		
 
@@ -182,11 +182,11 @@ void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 				break;
 		}
 
-		stack_name = stack_type_name(stack_info.type);
+		stack_name = stack_type_name(stack_info.type); // yyf: 打印堆栈类型
 		if (stack_name)
 			printk("%s <%s>\n", log_lvl, stack_name);
 
-		if (regs)
+		if (regs) // yyf: 打印寄存器信息
 			show_regs_if_on_stack(&stack_info, regs, partial);
 
 		/*
@@ -199,14 +199,14 @@ void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 		 * This also serves as a failsafe option in case the unwinder
 		 * goes off in the weeds.
 		 */
-		for (; stack < stack_info.end; stack++) {
+		for (; stack < stack_info.end; stack++) { // yyf: 地址扫描与展开
 			unsigned long real_addr;
 			int reliable = 0;
 			unsigned long addr = READ_ONCE_NOCHECK(*stack);
 			unsigned long *ret_addr_p =
 				unwind_get_return_address_ptr(&state);
 
-			if (!__kernel_text_address(addr))
+			if (!__kernel_text_address(addr)) // yyf: 跳过非内核代码地址
 				continue;
 
 			/*
@@ -229,7 +229,7 @@ void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 			 * tracing was involved.
 			 */
 			real_addr = ftrace_graph_ret_addr(task, &graph_idx,
-							  addr, stack);
+							  addr, stack); // yyf: ftrace 替换：返回地址可能被替换为 return_to_handler
 			if (real_addr != addr)
 				printk_stack_address(addr, 0, log_lvl);
 			printk_stack_address(real_addr, reliable, log_lvl);
@@ -243,7 +243,7 @@ next:
 			 * check for an error: if anything goes wrong, the rest
 			 * of the addresses will just be printed as unreliable.
 			 */
-			unwind_next_frame(&state);
+			unwind_next_frame(&state); // yyf: unwind_next_frame 推进到下一堆栈帧
 
 			/* if the frame has entry regs, print them */
 			regs = unwind_get_entry_regs(&state, &partial);

@@ -288,6 +288,8 @@ static void parse_elf(void *output)
 	void *dest;
 	int i;
 
+	warn("[    0.000000] # parse_elf [arch/x86/boot/compressed/misc.c]");
+
 	memcpy(&ehdr, output, sizeof(ehdr));
 	if (ehdr.e_ident[EI_MAG0] != ELFMAG0 ||
 	   ehdr.e_ident[EI_MAG1] != ELFMAG1 ||
@@ -373,9 +375,11 @@ asmlinkage __visible void *extract_kernel(void *rmode, memptr heap,
 
 	lines = boot_params->screen_info.orig_video_lines;
 	cols = boot_params->screen_info.orig_video_cols;
-	warn("# before console_init, No parameter could pass\n");
+	warn("[    0.000000] # before console_init, No parameter could pass");
 	console_init();
-	warn("# earlyprintk with console_init, No parameter could pass\n");
+	warn("[    0.000000] # call console_init()");
+ 	warn("[    0.000000] # (@0) extract_kernel [arch/x86/boot/compressed/misc.c]");
+ 	warn("[    0.000000] # (@0) extract_kernel earlyprintk with console_init, No parameter could pass [arch/x86/boot/compressed/misc.c]");
 	debug_putstr("early console in extract_kernel\n");
 
 	if (IS_ENABLED(CONFIG_X86_5LEVEL) && !l5_supported()) {
@@ -428,9 +432,10 @@ asmlinkage __visible void *extract_kernel(void *rmode, memptr heap,
 	debug_putstr("\nDecompressing Linux... ");
 	__decompress(input_data, input_len, NULL, NULL, output, output_len,
 			NULL, error);
-	parse_elf(output);
+	parse_elf(output); // yyf: 解析内核ELF
 	handle_relocations(output, output_len, virt_addr);
 	debug_putstr("done.\nBooting the kernel.\n");
+	warn("[    0.000000] # (@0) extract_kernel done jump to kernel [arch/x86/boot/compressed/misc.c]");
 	return output;
 }
 
