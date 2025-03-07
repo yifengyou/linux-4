@@ -569,7 +569,9 @@ asmlinkage __visible void __init start_kernel(void)
 	boot_cpu_init();
 	page_address_init();
 	pr_notice("%s", linux_banner);
+	
 	setup_arch(&command_line); // yyf: 设置体系结构相关设置、负责初始化自举分配器
+	
 	mm_init_cpumask(&init_mm);
 	setup_command_line(command_line);
 	setup_nr_cpu_ids();

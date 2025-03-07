@@ -340,8 +340,9 @@ extern void __memblock_dump_all(void);
 
 static inline void memblock_dump_all(void)
 {
-	if (memblock_debug)
-		__memblock_dump_all();
+	// yyf: skip check
+	//if (memblock_debug)
+	__memblock_dump_all();
 }
 
 /**

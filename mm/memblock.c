@@ -53,7 +53,9 @@ struct memblock memblock __initdata_memblock = {
 	.current_limit		= MEMBLOCK_ALLOC_ANYWHERE,
 };
 
-int memblock_debug __initdata_memblock;
+//int memblock_debug __initdata_memblock;
+// yyf: enable memblock debug
+int memblock_debug __initdata_memblock = 1;
 static bool system_has_some_mirror __initdata_memblock = false;
 static int memblock_can_resize __initdata_memblock;
 static int memblock_memory_in_slab __initdata_memblock = 0;
@@ -1712,6 +1714,9 @@ static void __init_memblock memblock_dump(struct memblock_type *type)
 #endif
 		pr_info(" %s[%#x]\t[%pa-%pa], %pa bytes%s flags: %#lx\n",
 			type->name, idx, &base, &end, &size, nid_buf, flags);
+		pr_kdev("%s File:[%s],Line:[%d] %s[%#x]\t[%pa-%pa], %pa bytes%s flags: %#lx\n",
+			 __FUNCTION__, __FILE__, __LINE__,
+			type->name, idx, &base, &end, &size, nid_buf, flags);
 	}
 }
 
@@ -1745,7 +1750,9 @@ void __init_memblock __memblock_dump_all(void)
 		&memblock.memory.total_size,
 		&memblock.reserved.total_size);
 
+	pr_kdev("%s File:[%s],Line:[%d] memblock.memory:\n", __FUNCTION__, __FILE__, __LINE__);
 	memblock_dump(&memblock.memory);
+	pr_kdev("%s File:[%s],Line:[%d] memblock.reserved:\n", __FUNCTION__, __FILE__, __LINE__);
 	memblock_dump(&memblock.reserved);
 #ifdef CONFIG_HAVE_MEMBLOCK_PHYS_MAP
 	memblock_dump(&memblock.physmem);

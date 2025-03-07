@@ -1136,8 +1136,19 @@ void __init setup_log_buf(int early)
 	logbuf_unlock_irqrestore(flags);
 
 	pr_info("log_buf_len: %u bytes\n", log_buf_len);
+	pr_kdev("%s File:[%s],Line:[%d] log_buf_len: %u bytes (%u MB)\n",
+		__FUNCTION__, __FILE__, __LINE__,
+		log_buf_len, 
+		log_buf_len / (1024 * 1024)
+		);
 	pr_info("early log buf free: %u(%u%%)\n",
 		free, (free * 100) / __LOG_BUF_LEN);
+	pr_kdev("%s File:[%s],Line:[%d] early log buf free: %u(%u MB %u%%)\n",
+		__FUNCTION__, __FILE__, __LINE__,
+		free,
+		free / (1024 * 1024),
+		(free * 100) / __LOG_BUF_LEN
+		);
 }
 
 static bool __read_mostly ignore_loglevel;

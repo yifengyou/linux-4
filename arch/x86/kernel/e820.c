@@ -1272,6 +1272,10 @@ void __init e820__memblock_setup(void)
 			continue;
 
 		memblock_add(entry->addr, entry->size);
+		// type looksup e820_type
+		pr_kdev("%s File:[%s],Line:[%d] add (start=0x%llx, size=%llu, type=%d) to memblock\n",
+			__FUNCTION__, __FILE__, __LINE__,
+			(unsigned long long)entry->addr, (unsigned long long)entry->size, entry->type);
 	}
 
 	/* Throw away partial pages: */

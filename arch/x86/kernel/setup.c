@@ -912,7 +912,7 @@ void __init setup_arch(char **cmdline_p)
 	x86_init.oem.arch_setup();
 
 	iomem_resource.end = (1ULL << boot_cpu_data.x86_phys_bits) - 1;
-	e820__memory_setup(); // yyf: e810 memory parse
+	e820__memory_setup(); // yyf: 解析e820内存信息
 	parse_setup_data();
 
 	copy_edd();
@@ -1107,7 +1107,16 @@ void __init setup_arch(char **cmdline_p)
 	cleanup_highmap();
 
 	memblock_set_current_limit(ISA_END_ADDRESS);
-	e820__memblock_setup();
+
+/*
+	memblock是必经阶段：它是内核从物理内存信息（e820）过渡到动态内存管理（伙伴系统）的桥梁。
+	核心价值：
+	解决早期内存分配的自举问题。
+	记录和保留关键内存区域（如内核代码、启动参数）。
+	为伙伴系统提供初始化所需的元数据内存。
+	直接跳过memblock的后果：内存管理无法初始化，导致内核启动失败。
+*/
+	e820__memblock_setup(); // yyf: e820__memory_setup中e820探测到的内存布局放到memblock中
 
 	reserve_bios_regions();
 
@@ -1167,7 +1176,7 @@ void __init setup_arch(char **cmdline_p)
 		init_ohci1394_dma_on_all_controllers();
 #endif
 	/* Allocate bigger log buffer */
-	setup_log_buf(1);
+	setup_log_buf(1); // yyf: setup log buffer
 
 	reserve_initrd();
 
