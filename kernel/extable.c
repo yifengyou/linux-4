@@ -1,4 +1,4 @@
-/* Rewritten by Rusty Russell, on the backs of many others...
+﻿/* Rewritten by Rusty Russell, on the backs of many others...
    Copyright (C) 2001 Rusty Russell, 2002 Rusty Russell IBM.
 
     This program is free software; you can redistribute it and/or modify
@@ -46,10 +46,34 @@ u32 __initdata __visible main_extable_sort_needed = 1;
 /* Sort the kernel's built-in exception table */
 void __init sort_main_extable(void)
 {
+	/*
+		__ex_table 的检索机制本质是 通过触发异常的指令地址匹配预定义的修复代码地址
+
+		在编译阶段，异常处理函数的地址可能按随机顺序存入表中。未经排序的异常表会导致查找时需线性遍历所有条目，效率低下。
+		通过 sort_main_extable() 按异常向量号（或地址范围）排序后，可支持二分查找（O(log n) 时间复杂度），显著提升异常响应速度。
+
+		在压力测试中，排序后的异常表可使异常处理延迟降低 30%-50%（尤其在多核高并发场景）
+		有序的异常表便于内核调试工具（如 kdump）快速定位异常上下文，减少故障排查时间
+	*/
+	
+	const struct exception_table_entry *entry;
+	unsigned long num_entries;
+	
 	if (main_extable_sort_needed && __stop___ex_table > __start___ex_table) {
 		pr_notice("Sorting __ex_table...\n");
 		sort_extable(__start___ex_table, __stop___ex_table);
+
+		/* 遍历所有异常表条目 */
+		pr_kdev("Exception Handler Entry:\n");
+		for (entry = __start___ex_table; entry < __stop___ex_table; entry++) {
+			pr_kdev("  Fault Address:[0x%lx] Fixup Address:[0x%lx] Offset:[%td] bytes\n",
+				entry->insn, entry->fixup, entry->fixup - entry->insn);
+		}
+	} else {
+		pr_kdev("__ex_table is empty or sorting not required\n");
 	}
+
+	// 打印ext_table
 }
 
 /* Given an address, look for it in the exception tables. */

@@ -549,6 +549,8 @@ asmlinkage __visible void __init start_kernel(void)
 	char *command_line;
 	char *after_dashes;
 
+	char *log_buf_ptr = log_buf_addr_get(); // yyf: log_buf是static
+
 	/* yyf: add multi variable type for test addr */
 	static long static_var = 0x1234567890ABCDEF;
 	long local_var = 0xEFDCBA0987654321;
@@ -558,6 +560,10 @@ asmlinkage __visible void __init start_kernel(void)
 	dump_stack();
 	pr_kdev("%s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 	pr_kdev("%s File:[%s],Line:[%d] enable early printk\n", __FUNCTION__, __FILE__, __LINE__);
+
+	// yyf: logbuf 是静态变量 static char __log_buf[__LOG_BUF_LEN] __aligned(LOG_ALIGN);
+	// setup_log_buf() 重新设置缓存大小、空间
+	pr_kdev("early log_buf addr:[0x%px] log_buf_len=[%d](%dKB)\n", log_buf_ptr, log_buf_len_get(), log_buf_len_get()/1024);
 
 	// yyf: 基本整数类型
 	pr_kdev("type [short] sizeof(short)=[%d]\n", sizeof(short));
@@ -647,7 +653,9 @@ asmlinkage __visible void __init start_kernel(void)
 	build_all_zonelists(NULL); // yyf: 建立node和zone数据结构
 	page_alloc_init();
 
-	pr_notice("Kernel command line: %s\n", boot_command_line);
+	pr_notice("Kernel command line: [%s]\n", boot_command_line);
+	pr_kdev("Kernel command line:[%s] addr:[%px]\n", boot_command_line, boot_command_line);
+	
 	/* parameters may set static keys */
 	jump_label_init();
 	parse_early_param();
@@ -663,9 +671,14 @@ asmlinkage __visible void __init start_kernel(void)
 	 * These use large bootmem allocations and must precede
 	 * kmem_cache_init()
 	 */
-	setup_log_buf(0);
+	setup_log_buf(0); // yyf: 创建并配置内核的环形日志缓冲区，用于存储printk等接口输出的日志信息
+	// yyf: logbuf 是静态变量 static char __log_buf[__LOG_BUF_LEN] __aligned(LOG_ALIGN);
+	pr_kdev("new  log_buf addr:[0x%px] log_buf_len=[%d](%dKB)\n", log_buf_ptr, log_buf_len_get(), log_buf_len_get()/1024);
+	
 	vfs_caches_init_early();
-	sort_main_extable();
+	
+	sort_main_extable(); // yyf: 异常向量表排序
+	
 	trap_init(); // 初始化异常
 	mm_init(); // yyf: 停用bootmem分配器，迁移到实际的内存管理函数
 
