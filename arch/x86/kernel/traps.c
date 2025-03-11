@@ -945,6 +945,48 @@ dotraplinkage void do_iret_error(struct pt_regs *regs, long error_code)
 }
 #endif
 
+static void __init kdev_print_idt_details(void)
+{
+	gate_desc *idt = idt_table; // 获取 IDT 起始地址
+	unsigned long num_entries = idt_descr.size; // 条目总数（通常为 256）
+	unsigned int i;
+
+	pr_kdev("IDT Details (Total entries:[%lu])\n", num_entries);
+
+	for (i = 0; i < num_entries; i++) {
+		gate_desc *entry = &idt[i];
+		const char *type_str;
+		u32 offset;
+
+		// 解析门描述符类型
+		switch (entry->bits.type) {
+			case GATE_INTERRUPT:  type_str = "Interrupt Gate"; break;
+			case GATE_TRAP:       type_str = "Trap Gate";      break;
+			case GATE_CALL:       type_str = "Call Gate";      break;
+			case GATE_TASK:       type_str = "Task Gate";      break;
+			default:              type_str = "Unknown";        break;
+		}
+
+		// 计算中断处理函数偏移量（兼容 x86_64）
+		offset = entry->offset_low | (entry->offset_middle << 16);
+#ifdef CONFIG_X86_64
+		offset |= (u64)entry->offset_high << 32;
+#endif
+
+		pr_kdev("Addr:[0x%pX] | Vector:[%3u] | Type:[%-14s] | DPL:[%d] | IST:[%d] | Handler:[0x%016lx] | Segment:[0x%04x](GDT Index:[%u], TI:[%s], RPL:[%d])\n",
+				entry,
+				i,
+				type_str,
+				entry->bits.dpl,		// 描述符特权级（0=内核, 3=用户）
+				entry->bits.ist,		// 中断栈表索引（0=默认栈）
+				(unsigned long)offset,	// 处理函数地址偏移量
+				entry->segment, 		// 段选择子原始值
+				entry->segment >> 3,	// GDT 索引 = 段选择子高 13 位
+				(entry->segment & 0x4) ? "LDT" : "GDT", // TI 位
+				entry->segment & 0x3);	// RPL（请求特权级）
+	}
+}
+
 void __init trap_init(void)
 {
 	/* Init cpu_entry_area before IST entries are set up */
@@ -971,4 +1013,8 @@ void __init trap_init(void)
 	x86_init.irqs.trap_init();
 
 	idt_setup_debugidt_traps();
+
+
+	// yyf: 打印idt详细信息
+	kdev_print_idt_details();
 }
