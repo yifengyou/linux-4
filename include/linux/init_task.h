@@ -171,6 +171,7 @@ extern struct cred init_cred;
 # define INIT_VTIME(tsk)
 #endif
 
+// yyf: 0号进程命名为swapper，起初用于init kernel，之后作为swapper使用
 #define INIT_TASK_COMM "swapper"
 
 #ifdef CONFIG_RT_MUTEXES

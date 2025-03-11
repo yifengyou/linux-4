@@ -549,13 +549,78 @@ asmlinkage __visible void __init start_kernel(void)
 	char *command_line;
 	char *after_dashes;
 
+	/* yyf: add multi variable type for test addr */
+	static long static_var = 0x1234567890ABCDEF;
+	long local_var = 0xEFDCBA0987654321;
+	char *str_ptr = "this_is_kernel_addr_test_string";
+	phys_addr_t static_phys, local_phys, str_phys;
+
 	dump_stack();
 	pr_kdev("%s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 	pr_kdev("%s File:[%s],Line:[%d] enable early printk\n", __FUNCTION__, __FILE__, __LINE__);
 
-	set_task_stack_end_magic(&init_task);
-	smp_setup_processor_id();
-	debug_objects_early_init();
+	// yyf: 基本整数类型
+	pr_kdev("type [short] sizeof(short)=[%d]\n", sizeof(short));
+	pr_kdev("type [int] sizeof(int)=[%d]\n", sizeof(int));
+	pr_kdev("type [long] sizeof(long)=[%d]\n", sizeof(long));
+	pr_kdev("type [long long] sizeof(long long)=[%d]\n\n", sizeof(long long));
+	
+	// yyf: 无符号整数类型
+	pr_kdev("type [unsigned short] sizeof(unsigned short)=[%d]\n", sizeof(unsigned short));
+	pr_kdev("type [unsigned int] sizeof(unsigned int)=[%d]\n", sizeof(unsigned int));
+	pr_kdev("type [unsigned long] sizeof(unsigned long)=[%d]\n", sizeof(unsigned long));
+	pr_kdev("type [unsigned long long] sizeof(unsigned long long)=[%d]\n\n", sizeof(unsigned long long));
+	
+	// yyf: 显式位宽类型（需包含 <linux/types.h>）
+	pr_kdev("type [u8] sizeof(u8)=[%d]\n", sizeof(u8));
+	pr_kdev("type [u16] sizeof(u16)=[%d]\n", sizeof(u16));
+	pr_kdev("type [u32] sizeof(u32)=[%d]\n", sizeof(u32));
+	pr_kdev("type [u64] sizeof(u64)=[%d]\n", sizeof(u64));
+	pr_kdev("type [s8] sizeof(s8)=[%d]\n", sizeof(s8));
+	pr_kdev("type [s16] sizeof(s16)=[%d]\n", sizeof(s16));
+	pr_kdev("type [s32] sizeof(s32)=[%d]\n", sizeof(s32));
+	pr_kdev("type [s64] sizeof(s64)=[%d]\n\n", sizeof(s64));
+	
+	// yyf: 指针类型
+	pr_kdev("type [void*] sizeof(void*)=[%d]\n", sizeof(void*));
+	pr_kdev("type [char*] sizeof(char*)=[%d]\n", sizeof(char*));
+	pr_kdev("type [int*] sizeof(int*)=[%d]\n", sizeof(int*));
+	pr_kdev("type [struct task_struct*] sizeof(struct task_struct*)=[%d]\n\n", sizeof(struct task_struct*));
+	
+	// yyf: 内核专用类型（需包含相关头文件）
+	pr_kdev("type [size_t] sizeof(size_t)=[%d]\n", sizeof(size_t)); // yyf: size_t（阳光型）无符号整型（unsigned long），表示不可能为负的计量值
+	pr_kdev("type [ssize_t] sizeof(ssize_t)=[%d]\n", sizeof(ssize_t)); // yyf: ssize_t（务实型）有符号整型（signed long），反馈成功/失败的场景
+	pr_kdev("type [phys_addr_t] sizeof(phys_addr_t)=[%d]\n", sizeof(phys_addr_t));
+	pr_kdev("type [loff_t] sizeof(loff_t)=[%d]\n", sizeof(loff_t));
+	pr_kdev("type [pid_t] sizeof(pid_t)=[%d]\n", sizeof(pid_t));
+	pr_kdev("type [dev_t] sizeof(dev_t)=[%d]\n", sizeof(dev_t));
+	pr_kdev("type [time_t] sizeof(time_t)=[%d]\n", sizeof(time_t));
+	pr_kdev("type [time64_t] sizeof(time64_t)=[%d]\n", sizeof(time64_t));
+	pr_kdev("type [bool] sizeof(bool)=[%d]\n\n", sizeof(bool));
+	
+	// yyf: 关键数据结构（大小可能随内核配置变化）
+	pr_kdev("type [struct task_struct] sizeof(struct task_struct)=[%d]\n", sizeof(struct task_struct));
+	pr_kdev("type [struct page] sizeof(struct page)=[%d]\n", sizeof(struct page));
+	pr_kdev("type [struct file] sizeof(struct file)=[%d]\n\n", sizeof(struct file));
+
+
+	// yyf: 打印静态变量信息
+	static_phys = virt_to_phys(&static_var);
+	pr_kdev("Static variable Virtual addr:[%px] Physical addr:[0x%llx] Value:[0x%llx]\n",
+		&static_var, static_phys, static_var);
+	// yyf: 打印局部变量信息
+	local_phys = virt_to_phys(&local_var);
+	pr_kdev("Local  variable Virtual addr:[%px] Physical addr:[0x%llx] Value:[0x%llx]\n",
+		&local_var, local_phys, local_var);
+	// yyf: 打印字符串信息
+	str_phys = virt_to_phys(str_ptr);
+	pr_kdev("String variable Virtual addr:[%px] Physical addr:[0x%llx] Value:[%s]\n\n",
+		str_ptr, str_phys, str_ptr);
+	
+
+	set_task_stack_end_magic(&init_task); // yyf: 为 0 号进程（init_task，即 idle 进程）的堆栈末端设置魔数（Magic Number），用于检测堆栈溢出。若堆栈越界破坏该魔数，内核会触发异常提示
+	smp_setup_processor_id(); // yyf: 对x86_64来说是空函数，其 CPU ID 通常由硬件或固件直接提供
+	debug_objects_early_init(); // yyf: 初始化内核调试子系统中的对象跟踪机制，用于检测内核对象（如链表、定时器）的生命周期错误（如重复释放、未初始化使用等）
 
 	cgroup_init_early();
 
@@ -566,7 +631,7 @@ asmlinkage __visible void __init start_kernel(void)
 	 * Interrupts are still disabled. Do necessary setups, then
 	 * enable them.
 	 */
-	boot_cpu_init();
+	boot_cpu_init(); // yyf: 将当前运行的 CPU（BSP）标记为在线、活跃和存在的状态
 	page_address_init();
 	pr_notice("%s", linux_banner);
 	
@@ -1214,7 +1279,7 @@ static noinline void __init kernel_init_freeable(void)
 	do_pre_smp_initcalls(); // yyf: 调用initcall机制的early段的函数
 	lockup_detector_init();
 
-	smp_init();
+	smp_init(); // yyf: 激活其他 CPU（APs）
 	sched_init_smp();
 
 	page_alloc_init_late();
@@ -1250,6 +1315,7 @@ static noinline void __init kernel_init_freeable(void)
 	 * rootfs is available now, try loading the public keys
 	 * and default modules
 	 */
+
 
 	integrity_load_keys();
 	load_default_modules();
