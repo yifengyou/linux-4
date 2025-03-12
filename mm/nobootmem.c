@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+﻿// SPDX-License-Identifier: GPL-2.0
 /*
  *  bootmem - A boot-time physical memory allocator and configurator
  *
@@ -129,12 +129,22 @@ static unsigned long __init __free_memory_core(phys_addr_t start,
 
 static unsigned long __init free_low_memory_core_early(void)
 {
+	/*
+		将memblock的内存释放到node中，仅用于nobootmem情况下
+	*/
 	unsigned long count = 0;
 	phys_addr_t start, end;
 	u64 i;
 
 	memblock_clear_hotplug(0, -1);
 
+	/*
+		for (i = 0, __next_reserved_mem_region(&i, &start, &end); 
+			i != (u64)ULLONG_MAX; 
+			__next_reserved_mem_region(&i, &start, &end)) {
+			reserve_bootmem_region(start, end);
+		}
+	*/
 	for_each_reserved_mem_region(i, &start, &end)
 		reserve_bootmem_region(start, end);
 
@@ -143,10 +153,26 @@ static unsigned long __init free_low_memory_core_early(void)
 	 *  because in some case like Node0 doesn't have RAM installed
 	 *  low ram will be on Node1
 	 */
-	for_each_free_mem_range(i, NUMA_NO_NODE, MEMBLOCK_NONE, &start, &end,
-				NULL)
-		count += __free_memory_core(start, end);
 
+	/* yyf: 遍历memblock
+
+	#define for_each_mem_range(i, type_a, type_b, nid, flags,		\
+			   p_start, p_end, p_nid)			\
+	for (i = 0, __next_mem_range(&i, nid, flags, type_a, type_b,	\
+				     p_start, p_end, p_nid);		\
+	     i != (u64)ULLONG_MAX;					\
+	     __next_mem_range(&i, nid, flags, type_a, type_b,		\
+			      p_start, p_end, p_nid))
+			      
+	#define for_each_free_mem_range(i, nid, flags, p_start, p_end, p_nid)	\
+			for_each_mem_range(i, &memblock.memory, &memblock.reserved, \
+					   nid, flags, p_start, p_end, p_nid)
+	*/
+	for_each_free_mem_range(i, NUMA_NO_NODE, MEMBLOCK_NONE, &start, &end,
+				NULL) {
+		count += __free_memory_core(start, end);
+		pr_kdev("yyf add mem size:[%ld]", count);
+	}
 	return count;
 }
 
@@ -178,11 +204,16 @@ void __init reset_all_zones_managed_pages(void)
  *
  * Returns the number of pages actually released.
  */
-unsigned long __init free_all_bootmem(void)
+unsigned long __init free_all_bootmem(void) // yyf: 不启用bootmem情况下用memblock，因为bootmem性能差
 {
+	/*
+		yyf: 通过CONFIG_NO_BOOTMEM=y配置，内核启用nobootmem兼容层。
+		此时，free_all_bootmem_core()实际调用memblock的释放逻辑，
+		遍历memblock.memory中的空闲区域，将其移交伙伴系统
+	*/
 	unsigned long pages;
 
-	reset_all_zones_managed_pages();
+	reset_all_zones_managed_pages(); // yyf: 将所有内存区域的managed_pages计数器归零，确保伙伴系统能正确统计可用页
 
 	pages = free_low_memory_core_early();
 	totalram_pages += pages;

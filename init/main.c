@@ -526,17 +526,28 @@ void __init __weak mem_encrypt_init(void) { }
 /*
  * Set up kernel memory allocators
  */
-static void __init mm_init(void)
+static void __init mm_init(void) // yyf: memory management initialization
 {
 	/*
 	 * page_ext requires contiguous pages,
 	 * bigger than MAX_ORDER unless SPARSEMEM.
 	 */
-	page_ext_init_flatmem();
-	mem_init();
-	kmem_cache_init();
-	pgtable_init();
-	vmalloc_init();
+
+	/*
+		mm_init() 在 start_kernel() 阶段被调用，其核心任务包括：
+		
+		初始化页扩展元数据（page_ext）
+		释放启动阶段保留的内存到伙伴系统
+		构建 slab 分配器基础设施
+		设置页表管理机制
+		初始化虚拟内存和 I/O 映射空间
+		处理 x86_64 架构特有的安全特性（如 PTI）
+	*/
+	page_ext_init_flatmem(); // yyf: 为每个物理页分配扩展元数据结构 page_ext，用于存储页状态跟踪、内存检测等高级功能数据
+	mem_init(); // yyf: 完成物理内存的最终初始化，释放启动阶段保留的内存到伙伴系统。
+	kmem_cache_init(); // yyf: 初始化 slab 分配器，创建用于分配小对象的缓存池。
+	pgtable_init(); // yyf: 初始化页表相关基础设施
+	vmalloc_init(); // yyf: 初始化 vmalloc 虚拟地址空间（位于内核地址空间的高端区域）
 	ioremap_huge_init();
 	/* Should be run before the first non-init thread is created */
 	init_espfix_bsp();

@@ -973,7 +973,7 @@ static void __init kdev_print_idt_details(void)
 		offset |= (u64)entry->offset_high << 32;
 #endif
 
-		pr_kdev("Addr:[0x%pX] | Vector:[%3u] | Type:[%-14s] | DPL:[%d] | IST:[%d] | Handler:[0x%016lx] | Segment:[0x%04x](GDT Index:[%u], TI:[%s], RPL:[%d])\n",
+		pr_kdev("Addr:[0x%px] | Vector:[%3u] | Type:[%-14s] | DPL:[%d] | IST:[%d] | Handler:[0x%016lx] | Segment:[0x%04x](GDT Index:[%u], TI:[%s], RPL:[%d])\n",
 				entry,
 				i,
 				type_str,

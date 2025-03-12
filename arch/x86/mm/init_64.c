@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  linux/arch/x86_64/mm/init.c
  *
  *  Copyright (C) 1995  Linus Torvalds
@@ -1173,7 +1173,7 @@ void __init mem_init(void)
 	/* clear_bss() already clear the empty_zero_page */
 
 	/* this will put all memory onto the freelists */
-	free_all_bootmem();
+	free_all_bootmem(); // yyf: 将启动阶段分配的物理页交还给伙伴系统
 	after_bootmem = 1;
 
 	/*
