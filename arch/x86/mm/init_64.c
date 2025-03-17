@@ -1166,14 +1166,14 @@ static void __init register_page_bootmem_info(void)
 #endif
 }
 
-void __init mem_init(void)
+void __init mem_init(void) // yyf: x86_64
 {
 	pci_iommu_alloc();
 
 	/* clear_bss() already clear the empty_zero_page */
 
 	/* this will put all memory onto the freelists */
-	free_all_bootmem(); // yyf: 将启动阶段分配的物理页交还给伙伴系统
+	free_all_bootmem(); // yyf: 将启动阶段分配的物理页交还给伙伴系统。传统的是bootmem，但是性能太差，目前普遍都是memblock
 	after_bootmem = 1;
 
 	/*
@@ -1187,7 +1187,9 @@ void __init mem_init(void)
 	/* Register memory areas for /proc/kcore */
 	kclist_add(&kcore_vsyscall, (void *)VSYSCALL_ADDR, PAGE_SIZE, KCORE_USER);
 
-	mem_init_print_info(NULL);
+	mem_init_print_info(NULL); // yyf: 打印内存相关信息
+	// [ 0.000000] Memory: 8077872K/8388084K available (12300K kernel code, 
+	// 2477K rwdata, 4232K rodata, 2472K init, 2720K bss, 310212K reserved, 0K cma-reserved)
 }
 
 int kernel_set_to_readonly;

@@ -1,4 +1,4 @@
-/*
+﻿/*
  *
  *  Copyright (C) 1995  Linus Torvalds
  *
@@ -762,7 +762,7 @@ static void __init test_wp_bit(void)
 	panic("Linux doesn't support CPUs with broken WP.");
 }
 
-void __init mem_init(void)
+void __init mem_init(void) // yyf: x86非64位
 {
 	pci_iommu_alloc();
 

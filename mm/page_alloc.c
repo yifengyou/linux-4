@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  linux/mm/page_alloc.c
  *
  *  Manages the free list, the system allocates free pages here.
@@ -1354,6 +1354,7 @@ meminit_pfn_in_nid(unsigned long pfn, int node,
 void __init __free_pages_bootmem(struct page *page, unsigned long pfn,
 							unsigned int order)
 {
+	// yyf: 将​连续的物理内存页按伙伴系统规则释放到空闲列表，完成从 memblock 到伙伴系统的内存管理权转移
 	if (early_page_uninitialised(pfn))
 		return;
 	return __free_pages_boot_core(page, order);

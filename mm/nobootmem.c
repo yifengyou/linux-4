@@ -127,10 +127,59 @@ static unsigned long __init __free_memory_core(phys_addr_t start,
 	return end_pfn - start_pfn;
 }
 
+static void __init kdev_dump_memblock_info(void)
+{
+	struct memblock_region *reg;
+	int i;
+
+	// 打印 memory 区域
+	pr_kdev("kdev memblock.memory:\n");
+	for (i = 0; i < memblock.memory.cnt; i++) {
+		reg = &memblock.memory.regions[i];
+		pr_kdev("[%3d] [0x%016llx-0x%016llx], flags: 0x%x (size: %llu MB / %llu KB)\n",
+				i, reg->base, reg->base + reg->size,
+				reg->flags, 
+				reg->size >> 20,          // 转换为 MB（1 MB = 1024 KB）
+				reg->size >> 10);         // 转换为 KB（1 KB = 1024 B）
+	}
+
+	// 打印 reserved 区域
+	pr_kdev("kdev memblock.reserved:\n");
+	for (i = 0; i < memblock.reserved.cnt; i++) {
+		reg = &memblock.reserved.regions[i];
+		pr_kdev("[%3d] [0x%016llx-0x%016llx], flags: 0x%x (size: %llu MB / %llu KB)\n",
+				i, reg->base, reg->base + reg->size,
+				reg->flags, 
+				reg->size >> 20,          // 转换为 MB
+				reg->size >> 10);         // 转换为 KB
+	}
+}
+
+void print_node_memory_info(void)
+{
+	int nid;
+	pg_data_t *pgdat;
+
+	for_each_online_node(nid) {
+		pgdat = NODE_DATA(nid);
+		pr_kdev("Node %d: Start=0x%llx, End=0x%llx, Pages=%lu\n",
+				nid,
+				(u64)pgdat->node_start_pfn << PAGE_SHIFT,
+				(u64)(pgdat->node_start_pfn + pgdat->node_spanned_pages) << PAGE_SHIFT,
+				pgdat->node_present_pages);
+	}
+}
+
 static unsigned long __init free_low_memory_core_early(void)
 {
 	/*
 		将memblock的内存释放到node中，仅用于nobootmem情况下
+		函数通过遍历memblock的可用内存区域，按伙伴系统的内存块大小（2的order次幂）划分内存，
+		并添加到free_area链表中。这标志着内存管理从临时性的memblock过渡到正式的伙伴系统
+
+		mm_init → mem_init → memblock_free_all → free_low_memory_core_early →
+		__free_memory_core → __free_pages_memory → memblock_free_pages →
+		__free_pages_core → __free_one_page
 	*/
 	unsigned long count = 0;
 	phys_addr_t start, end;
@@ -156,6 +205,11 @@ static unsigned long __init free_low_memory_core_early(void)
 
 	/* yyf: 遍历memblock
 
+	void __next_mem_range(u64 *idx, int nid, ulong flags,
+				 struct memblock_type *type_a,
+				 struct memblock_type *type_b, phys_addr_t *out_start,
+				 phys_addr_t *out_end, int *out_nid);
+
 	#define for_each_mem_range(i, type_a, type_b, nid, flags,		\
 			   p_start, p_end, p_nid)			\
 	for (i = 0, __next_mem_range(&i, nid, flags, type_a, type_b,	\
@@ -167,12 +221,35 @@ static unsigned long __init free_low_memory_core_early(void)
 	#define for_each_free_mem_range(i, nid, flags, p_start, p_end, p_nid)	\
 			for_each_mem_range(i, &memblock.memory, &memblock.reserved, \
 					   nid, flags, p_start, p_end, p_nid)
+
+	__next_free_mem_range遍历 memblock 的空闲区域（memblock.memory 减去 memblock.reserved），返回满足条件的区域
+
+	{
+		int __i = 0;
+		phys_addr_t start, end;
+
+		for (__i = 0, __next_mem_range(&__i, NUMA_NO_NODE, MEMBLOCK_NONE, &start, &end, NULL);
+			__i != (u64)ULLONG_MAX;
+			__next_mem_range(&__i, NUMA_NO_NODE, MEMBLOCK_NONE, &start, &end, NULL)
+		) {
+			count += __free_memory_core(start, end);
+			pr_kdev("%s File:[%s],Line:[%d] try add [0x%016llx]-[0x%016llx] to node, totalram_pages:[%ld]*4K\n",
+			   __func__, __FILE__, __LINE__, start, end, count);
+		}
+	}
 	*/
+
+
+	
+	kdev_dump_memblock_info(); // yyf: 打印memblock信息，memblock信息不消失
 	for_each_free_mem_range(i, NUMA_NO_NODE, MEMBLOCK_NONE, &start, &end,
 				NULL) {
 		count += __free_memory_core(start, end);
-		pr_kdev("yyf add mem size:[%ld]", count);
+		pr_kdev("%s File:[%s],Line:[%d] try add [0x%016llx]-[0x%016llx] to node, totalram_pages:[%ld]*4K\n",
+			__FUNCTION__, __FILE__, __LINE__, start, end, count);
 	}
+
+	print_node_memory_info();
 	return count;
 }
 
@@ -216,6 +293,8 @@ unsigned long __init free_all_bootmem(void) // yyf: 不启用bootmem情况下用
 	reset_all_zones_managed_pages(); // yyf: 将所有内存区域的managed_pages计数器归零，确保伙伴系统能正确统计可用页
 
 	pages = free_low_memory_core_early();
+	
+	// unsigned long totalram_pages;
 	totalram_pages += pages;
 
 	return pages;
