@@ -1,0 +1,11 @@
+sourcedir = /linux/linux-4.git
+arch = x86_64
+debug = True
+skipimagecheck = True
+vmname = kdev-linux4
+config = ubuntu18_x86_64_defconfig
+nodocker = False
+mrproper = False
+rclocal = /linux/linux-4.git-build-x86_64/rclocal
+qcow2_image = /linux/linux-4.git-build-x86_64/rootfs.qcow2
+

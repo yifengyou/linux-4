@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ -f /etc/firstboot ]; then
+	mv /etc/firstboot /etc/firstboot-bak
+	cd /boot
+	rm -f *.old *4.19.282*
+	sed -i 's/quiet splash/level=10 log_level=0x9400 console_log_level=8 console=ttyS0 apparmor=0/g' /etc/default/grub
+	sed -i '/^GRUB_HIDDEN/d' /etc/default/grub
+	sed -i 's/GRUB_TIMEOUT=10/GRUB_TIMEOUT=20/g' /etc/default/grub
+	sed -i 's/GRUB_DEFAULT=0/GRUB_DEFAULT=2/g' /etc/default/grub
+	update-initramfs -c -k 4.15.18-kdev
+	update-grub2
+	sync
+
+	if which chpasswd &> /dev/null ; then
+		echo root:linux | chpasswd
+	elif which passwd &> /dev/null ; then
+		echo linux | passwd -stdin root
+	else
+		echo "can't reset root passwd"
+	fi
+	sync
+	reboot -f
+fi
+
+exit 0
+
