@@ -3,7 +3,9 @@ VERSION = 4
 PATCHLEVEL = 15
 SUBLEVEL = 18
 EXTRAVERSION = -kdev
+LOCALVERSION =
 NAME = Fearless Coyote
+
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"

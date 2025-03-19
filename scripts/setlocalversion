@@ -9,6 +9,7 @@
 # <nico-linuxsetlocalversion -at- schottelius.org>.
 #
 #
+exit 0
 
 usage() {
 	echo "Usage: $0 [--save-scmversion] [srctree]" >&2
