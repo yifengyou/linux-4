@@ -4,7 +4,7 @@ if [ -f /etc/firstboot ]; then
 	mv /etc/firstboot /etc/firstboot-bak
 	cd /boot
 	rm -f *.old *4.19.282*
-	sed -i 's/quiet splash/level=10 log_level=0x9400 console_log_level=8 console=ttyS0 apparmor=0/g' /etc/default/grub
+	sed -i '/^GRUB_CMDLINE_LINUX_DEFAULT/c\GRUB_CMDLINE_LINUX_DEFAULT="ro console=tty0 console=ttyS0,115200n8 nokaslr debug earlyprintk=ttyS0 net.ifnames=0 biosdevname=0 kgdboc=ttyS0,115200 kgdbwait initcall_debug log_buf_len=32M serial8250.poll_timeout=10   level=10 console=ttyS0 apparmor=0 nokaslr debug earlyprintk=ttyS0 net.ifnames=0 biosdevname=0 kgdboc=ttyS0,115200 kgdbwait initcall_debug log_buf_len=32M serial8250.poll_timeout=10 "' /etc/default/grub
 	sed -i '/^GRUB_HIDDEN/d' /etc/default/grub
 	sed -i 's/GRUB_TIMEOUT=10/GRUB_TIMEOUT=20/g' /etc/default/grub
 	sed -i 's/GRUB_DEFAULT=0/GRUB_DEFAULT=2/g' /etc/default/grub
@@ -22,6 +22,8 @@ if [ -f /etc/firstboot ]; then
 	sync
 	reboot -f
 fi
+
+dhclient
 
 exit 0
 
