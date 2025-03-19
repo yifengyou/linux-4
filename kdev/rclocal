@@ -4,6 +4,7 @@ set -x
 
 if [ -f /etc/firstboot ]; then
 	rm -f /etc/firstboot
+	rm -f /etc/update-motd.d/*
 	cd /boot
 	rm -f *.old *4.19.282*
 	cat > /etc/default/grub << EOF
@@ -15,7 +16,7 @@ if [ -f /etc/firstboot ]; then
 GRUB_DEFAULT=2
 # GRUB_TIMEOUT_STYLE=hidden
 GRUB_TIMEOUT=20
-GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
+GRUB_DISTRIBUTOR=\`lsb_release -i -s 2> /dev/null || echo Debian\`
 GRUB_CMDLINE_LINUX_DEFAULT="rw console=tty0 console=ttyS0,115200n8 nokaslr earlyprintk=ttyS0 net.ifnames=0 biosdevname=0 kgdboc=ttyS0,115200 kgdbwait initcall_debug log_buf_len=32M serial8250.poll_timeout=10 level=10 apparmor=0 debug"
 GRUB_CMDLINE_LINUX=""
 
@@ -29,7 +30,7 @@ GRUB_CMDLINE_LINUX=""
 
 # The resolution used on graphical terminal
 # note that you can use only modes which your graphic card supports via VBE
-# you can see them in real GRUB with the command `vbeinfo'
+# you can see them in real GRUB with the command \`vbeinfo'
 #GRUB_GFXMODE=640x480
 
 # Uncomment if you don't want GRUB to pass "root=UUID=xxx" parameter to Linux
