@@ -446,6 +446,11 @@ int __init acpi_numa_init(void)
 	 */
 
 	/* SRAT: System Resource Affinity Table */
+	
+	/* ACPI SRAT（System Resource Allocation Table）表是ACPI规范中的关键组成部分，
+	   主要用于向操作系统提供系统中硬件资源的拓扑结构和分配信息，尤其在多核处理器、
+	   多节点内存架构及复杂电源管理场景下至关重要。
+	*/
 	if (!acpi_table_parse(ACPI_SIG_SRAT, acpi_parse_srat)) {
 		struct acpi_subtable_proc srat_proc[3];
 

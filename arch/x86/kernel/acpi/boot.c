@@ -1629,6 +1629,8 @@ int __init early_acpi_boot_init(void)
 
 int __init acpi_boot_init(void)
 {
+	pr_kdev("%s File:[%s],Line:[%d]\n", __FUNCTION__, __FILE__, __LINE__);
+
 	/* those are executed after early-quirks are executed */
 	dmi_check_system(acpi_dmi_table_late);
 
