@@ -567,6 +567,8 @@ EXPORT_SYMBOL_GPL(kobject_uevent_env);
  */
 int kobject_uevent(struct kobject *kobj, enum kobject_action action)
 {
+	pr_kdev("%s File:[%s],Line:[%d] send an uevent kobj=[%s],action=[%d]\n",
+		__FUNCTION__, __FILE__, __LINE__, kobj->name, action);
 	return kobject_uevent_env(kobj, action, NULL);
 }
 EXPORT_SYMBOL_GPL(kobject_uevent);
