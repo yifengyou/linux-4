@@ -3063,20 +3063,29 @@ static int check_modinfo(struct module *mod, struct load_info *info, int flags)
 
 	if (flags & MODULE_INIT_IGNORE_VERMAGIC)
 		modmagic = NULL;
-
+	
 	/* This is allowed: modprobe --force will invalidate it. */
 	if (!modmagic) {
-		pr_kdev("%s File:[%s],Line:[%d] MODULE_INIT_IGNORE_VERMAGIC\n", __FUNCTION__, __FILE__, __LINE__);
+		pr_kdev("%s File:[%s],Line:[%d] force load [%s] vermagic modmagic=[%s] vermagic=[%s]\n",
+			__FUNCTION__, __FILE__, __LINE__, mod->name, modmagic, vermagic);
 		err = try_to_force_load(mod, "bad vermagic");
 		if (err)
 			return err;
 	} else if (!same_magic(modmagic, vermagic, info->index.vers)) {
-		pr_kdev("%s File:[%s],Line:[%d] mod vermagic compare modmagic=[%s] ?= vermagic=[%s]\n",
-			__FUNCTION__, __FILE__, __LINE__, modmagic, vermagic);
+		pr_kdev("%s File:[%s],Line:[%d] try load [%s] vermagic modmagic=[%s] != vermagic=[%s]\n",
+			__FUNCTION__, __FILE__, __LINE__, mod->name, modmagic, vermagic);
 		pr_err("%s: version magic '%s' should be '%s'\n",
 		       info->name, modmagic, vermagic);
 		return -ENOEXEC;
 	}
+	if (!modmagic) {
+		pr_kdev("%s File:[%s],Line:[%d] try load [%s] vermagic compare modmagic=[%s] SKIP vermagic=[%s]\n",
+			__FUNCTION__, __FILE__, __LINE__, mod->name, modmagic, vermagic);
+	} else {
+		pr_kdev("%s File:[%s],Line:[%d] try load [%s] vermagic compare modmagic=[%s] == vermagic=[%s]\n",
+			__FUNCTION__, __FILE__, __LINE__, mod->name, modmagic, vermagic);
+	}
+
 
 	if (!get_modinfo(info, "intree")) {
 		if (!test_taint(TAINT_OOT_MODULE))
