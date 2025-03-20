@@ -1270,6 +1270,8 @@ static int try_to_force_load(struct module *mod, const char *reason)
 	add_taint_module(mod, TAINT_FORCED_MODULE, LOCKDEP_NOW_UNRELIABLE);
 	return 0;
 #else
+	pr_kdev("%s File:[%s],Line:[%d] CONFIG_MODULE_FORCE_LOAD not enabled! skip load!\n",
+		__FUNCTION__, __FILE__, __LINE__, mod->name, modmagic, vermagic);
 	return -ENOEXEC;
 #endif
 }
@@ -2833,8 +2835,12 @@ static int module_sig_check(struct load_info *info, int flags)
 
 	/* Not having a signature is only an error if we're strict. */
 	if (err == -ENOKEY && !sig_enforce &&
-	    !kernel_is_locked_down("Loading of unsigned modules"))
+	    !kernel_is_locked_down("Loading of unsigned modules")) {
+		pr_kdev("%s File:[%s],Line:[%d] (err=[%d],sig_enforce=[%d],is_lock_down=[%d]) skip sign check\n",
+			__FUNCTION__, __FILE__, __LINE__, err, sig_enforce,
+			kernel_is_locked_down("Loading of unsigned modules"));
 		err = 0;
+	}
 
 	return err;
 }
