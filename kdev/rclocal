@@ -89,7 +89,7 @@ EOF
 	dhclient
 	sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
 	sed -i 's/security.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
-	apt-get update && apt-get install -y vim tmux openssh-server net-tools
+	apt-get update && apt-get install -y vim tmux openssh-server net-tools build-essential
 	sed -i '/^#PermitRootLogin/c\PermitRootLogin yes' /etc/ssh/sshd_config
 	sync
 	reboot -f

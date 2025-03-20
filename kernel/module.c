@@ -3066,10 +3066,13 @@ static int check_modinfo(struct module *mod, struct load_info *info, int flags)
 
 	/* This is allowed: modprobe --force will invalidate it. */
 	if (!modmagic) {
+		pr_kdev("%s File:[%s],Line:[%d] MODULE_INIT_IGNORE_VERMAGIC\n", __FUNCTION__, __FILE__, __LINE__);
 		err = try_to_force_load(mod, "bad vermagic");
 		if (err)
 			return err;
 	} else if (!same_magic(modmagic, vermagic, info->index.vers)) {
+		pr_kdev("%s File:[%s],Line:[%d] mod vermagic compare modmagic=[%s] ?= vermagic=[%s]\n",
+			__FUNCTION__, __FILE__, __LINE__, modmagic, vermagic);
 		pr_err("%s: version magic '%s' should be '%s'\n",
 		       info->name, modmagic, vermagic);
 		return -ENOEXEC;
