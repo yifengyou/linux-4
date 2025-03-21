@@ -948,10 +948,11 @@ dotraplinkage void do_iret_error(struct pt_regs *regs, long error_code)
 static void __init kdev_print_idt_details(void)
 {
 	gate_desc *idt = idt_table; // 获取 IDT 起始地址
-	unsigned long num_entries = idt_descr.size; // 条目总数（通常为 256）
+	// unsigned long num_entries = idt_descr.size; // 条目总数（通常为 256）
+	unsigned long num_entries = 256; // 条目总数（通常为 256）
 	unsigned int i;
 
-	pr_kdev("IDT Details (Total entries:[%lu])\n", num_entries);
+	pr_kdev("IDT Details (Total entries:[%lu] Print entries:[%d])\n", idt_descr.size, num_entries);
 
 	for (i = 0; i < num_entries; i++) {
 		gate_desc *entry = &idt[i];

@@ -1182,7 +1182,7 @@ void __init setup_arch(char **cmdline_p)
 
 	acpi_table_upgrade();
 	/* Look for ACPI tables and reserve memory occupied by them. */
-	acpi_boot_table_init();
+	acpi_boot_table_init(); // kdev: 初始化acpi各种表
 
 	vsmp_init();
 
