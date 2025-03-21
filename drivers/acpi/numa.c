@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  acpi_numa.c - ACPI NUMA support
  *
  *  Copyright (C) 2002 Takayoshi Kochi <t-kochi@bq.jp.nec.com>
@@ -322,12 +322,33 @@ out_err:
 static int __init acpi_parse_slit(struct acpi_table_header *table)
 {
 	struct acpi_table_slit *slit = (struct acpi_table_slit *)table;
+	int from, to, pos;
+	char buffer[128];
+	
+	pr_kdev("%s File:[%s],Line:[%d] slit_valid(slit)=[%d]\n",
+		__FUNCTION__, __FILE__, __LINE__, slit_valid(slit));
 
 	if (!slit_valid(slit)) {
 		pr_info("SLIT table looks invalid. Not used.\n");
 		return -EINVAL;
 	}
 	acpi_numa_slit_init(slit);
+
+
+	// 打印 NUMA 节点距离矩阵
+	pr_kdev("ACPI SLIT: NUMA Distance Matrix (Node Count = %d)\n", slit->locality_count);
+	for (from = 0; from < slit->locality_count; from++) {
+		// 格式化每行输出
+		pos += snprintf(buffer + pos, sizeof(buffer) - pos, "Node %3d: ", from);
+		for (to = 0; to < slit->locality_count; to++) {
+			uint8_t distance = slit->entry[from * slit->locality_count + to];
+			// 将 0xFF 转换为内核默认值（LOCAL_DISTANCE）
+			if (distance == 0xFF)
+				distance = LOCAL_DISTANCE;
+			pos += snprintf(buffer + pos, sizeof(buffer) - pos, "%3d ", distance);
+		}
+		pr_kdev("%s\n", buffer);
+	}
 
 	return 0;
 }
@@ -447,7 +468,7 @@ int __init acpi_numa_init(void)
 
 	/* SRAT: System Resource Affinity Table */
 	
-	/* ACPI SRAT（System Resource Allocation Table）表是ACPI规范中的关键组成部分，
+	/* kdev: ACPI SRAT（System Resource Allocation Table）表是ACPI规范中的关键组成部分，
 	   主要用于向操作系统提供系统中硬件资源的拓扑结构和分配信息，尤其在多核处理器、
 	   多节点内存架构及复杂电源管理场景下至关重要。
 	*/
@@ -470,6 +491,8 @@ int __init acpi_numa_init(void)
 					    acpi_parse_memory_affinity,
 					    NR_NODE_MEMBLKS);
 	}
+
+	pr_kdev("%s File:[%s],Line:[%d] parse slit\n", __FUNCTION__, __FILE__, __LINE__);
 
 	/* SLIT: System Locality Information Table */
 	acpi_table_parse(ACPI_SIG_SLIT, acpi_parse_slit);
