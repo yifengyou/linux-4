@@ -432,7 +432,7 @@ asmlinkage __visible void *extract_kernel(void *rmode, memptr heap,
 	debug_putstr("\nDecompressing Linux... ");
 	__decompress(input_data, input_len, NULL, NULL, output, output_len,
 			NULL, error);
-	parse_elf(output); // yyf: 解析内核ELF
+	parse_elf(output); // kdev: 解析内核ELF
 	handle_relocations(output, output_len, virt_addr);
 	debug_putstr("done.\nBooting the kernel.\n");
 	warn("[    0.000000] # (@0) extract_kernel done jump to kernel [arch/x86/boot/compressed/misc.c]");

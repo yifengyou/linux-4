@@ -1,7 +1,7 @@
 #!/bin/sh
 set -x
 
-echo "yyf: genimage.sh run [$@]"
+echo "kdev: genimage.sh run [$@]"
 
 #
 # This file is subject to the terms and conditions of the GNU General Public
@@ -118,7 +118,7 @@ geniso() {
 	if [ -f "$FDINITRD" ] ; then
 		cp "$FDINITRD" $tmp_dir/initrd.img
 	fi
-	echo "yyf: workdir:"`pwd`
+	echo "kdev: workdir:"`pwd`
 	genisoimage -J -r -input-charset=utf-8 -quiet -o $FIMAGE \
 		-b isolinux.bin -c boot.cat -no-emul-boot -boot-load-size 4 \
 		-boot-info-table $tmp_dir

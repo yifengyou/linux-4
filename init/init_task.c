@@ -16,7 +16,7 @@
 static struct signal_struct init_signals = INIT_SIGNALS(init_signals);
 static struct sighand_struct init_sighand = INIT_SIGHAND(init_sighand);
 
-// yyf: 0号进程的任务结构体（struct task_struct）在编译时静态初始化，存储在init_task变量中
+// kdev: 0号进程的任务结构体（struct task_struct）在编译时静态初始化，存储在init_task变量中
 /*
 当系统启动完成后，0号进程转变为空闲进程，其核心行为包括：
 

@@ -429,8 +429,8 @@ struct irq_stack {
 	u32                     stack[THREAD_SIZE/sizeof(u32)];
 } __aligned(THREAD_SIZE);
 
-DECLARE_PER_CPU(struct irq_stack *, hardirq_stack); // yyf: 每个CPU都有硬中断栈
-DECLARE_PER_CPU(struct irq_stack *, softirq_stack); // yyf: 每个CPU都有软中断栈
+DECLARE_PER_CPU(struct irq_stack *, hardirq_stack); // kdev: 每个CPU都有硬中断栈
+DECLARE_PER_CPU(struct irq_stack *, softirq_stack); // kdev: 每个CPU都有软中断栈
 #endif	/* X86_64 */
 
 extern unsigned int fpu_kernel_xstate_size;

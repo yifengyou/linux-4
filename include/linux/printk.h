@@ -284,11 +284,11 @@ static inline void printk_safe_flush_on_panic(void)
 extern int kptr_restrict;
 
 extern asmlinkage void dump_stack(void) __cold;
-// yyf: get stack depth
+// kdev: get stack depth
 extern asmlinkage int kdev_get_stack_depth(void) __cold;
 
 
-// yyf:
+// kdev:
 extern asmlinkage __visible int kdev_printk(const char *fmt, ...);
 
 #ifndef pr_fmt
@@ -314,7 +314,7 @@ extern asmlinkage __visible int kdev_printk(const char *fmt, ...);
 #define pr_printk_hash(level, format, ...) \
 	printk(level pr_fmt(format), ##__VA_ARGS__)
 
-// yyf: add kdev_pr_printk_hash
+// kdev: add kdev_pr_printk_hash
 #define kdev_pr_printk_hash(format, ...) \
 	kdev_printk(pr_fmt(format), ##__VA_ARGS__)
 
@@ -341,7 +341,7 @@ extern asmlinkage __visible int kdev_printk(const char *fmt, ...);
 	pr_printk_hash(KERN_NOTICE, fmt, ##__VA_ARGS__)
 #define pr_info(fmt, ...) \
 	pr_printk_hash(KERN_INFO, fmt, ##__VA_ARGS__)
-// yyf: add pr_kdev
+// kdev: add pr_kdev
 #define pr_kdev(fmt, ...) \
 	kdev_pr_printk_hash(fmt, ##__VA_ARGS__)
 /*

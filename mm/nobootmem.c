@@ -203,7 +203,7 @@ static unsigned long __init free_low_memory_core_early(void)
 	 *  low ram will be on Node1
 	 */
 
-	/* yyf: 遍历memblock
+	/* kdev: 遍历memblock
 
 	void __next_mem_range(u64 *idx, int nid, ulong flags,
 				 struct memblock_type *type_a,
@@ -241,7 +241,7 @@ static unsigned long __init free_low_memory_core_early(void)
 
 
 	
-	kdev_dump_memblock_info(); // yyf: 打印memblock信息，memblock信息不消失
+	kdev_dump_memblock_info(); // kdev: 打印memblock信息，memblock信息不消失
 	for_each_free_mem_range(i, NUMA_NO_NODE, MEMBLOCK_NONE, &start, &end,
 				NULL) {
 		count += __free_memory_core(start, end);
@@ -281,16 +281,16 @@ void __init reset_all_zones_managed_pages(void)
  *
  * Returns the number of pages actually released.
  */
-unsigned long __init free_all_bootmem(void) // yyf: 不启用bootmem情况下用memblock，因为bootmem性能差
+unsigned long __init free_all_bootmem(void) // kdev: 不启用bootmem情况下用memblock，因为bootmem性能差
 {
 	/*
-		yyf: 通过CONFIG_NO_BOOTMEM=y配置，内核启用nobootmem兼容层。
+		kdev: 通过CONFIG_NO_BOOTMEM=y配置，内核启用nobootmem兼容层。
 		此时，free_all_bootmem_core()实际调用memblock的释放逻辑，
 		遍历memblock.memory中的空闲区域，将其移交伙伴系统
 	*/
 	unsigned long pages;
 
-	reset_all_zones_managed_pages(); // yyf: 将所有内存区域的managed_pages计数器归零，确保伙伴系统能正确统计可用页
+	reset_all_zones_managed_pages(); // kdev: 将所有内存区域的managed_pages计数器归零，确保伙伴系统能正确统计可用页
 
 	pages = free_low_memory_core_early();
 	

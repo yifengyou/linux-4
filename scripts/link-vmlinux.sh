@@ -35,7 +35,7 @@
 # Error out on error
 set -xe
 
-# echo "yyf: [$0] [$1] [$2] [$3]"
+# echo "kdev: [$0] [$1] [$2] [$3]"
 
 # Nice output in kbuild format
 # Will be supressed by "make -s"
@@ -87,11 +87,11 @@ modpost_link()
 			--end-group"
 	fi
 
-	#echo "yyf: [${LD} ${LDFLAGS} -r -o ${1} ${objects}]"
-	#echo "yyf: LD:[${LD}]"
-	#echo "yyf: LDFLAGS:[${LDFLAGS}]"
-	#echo "yyf: \${1}:[${1}}]"
-	#echo "yyf: objects:[${objects}]"
+	#echo "kdev: [${LD} ${LDFLAGS} -r -o ${1} ${objects}]"
+	#echo "kdev: LD:[${LD}]"
+	#echo "kdev: LDFLAGS:[${LDFLAGS}]"
+	#echo "kdev: \${1}:[${1}}]"
+	#echo "kdev: objects:[${objects}]"
 	${LD} ${LDFLAGS} -r -o ${1} ${objects}
 }
 
@@ -121,13 +121,13 @@ vmlinux_link()
 				${1}"
 		fi
 
-		#echo "yyf: [${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o ${2} -T ${lds} ${objects}]"
-		#echo "yyf: LD:[${LD}]"
-		#echo "yyf: LDFLAGS:[${LDFLAGS}]"
-		#echo "yyf: LDFLAGS_vmlinux:[${LDFLAGS_vmlinux}]"
-		#echo "yyf: \$2:[${2}]"
-		#echo "yyf: lds:[${lds}]"
-		#echo "yyf: objects:[${objects}]"
+		#echo "kdev: [${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o ${2} -T ${lds} ${objects}]"
+		#echo "kdev: LD:[${LD}]"
+		#echo "kdev: LDFLAGS:[${LDFLAGS}]"
+		#echo "kdev: LDFLAGS_vmlinux:[${LDFLAGS_vmlinux}]"
+		#echo "kdev: \$2:[${2}]"
+		#echo "kdev: lds:[${lds}]"
+		#echo "kdev: objects:[${objects}]"
 
 		${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o ${2}		\
 			-T ${lds} ${objects}

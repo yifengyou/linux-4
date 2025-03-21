@@ -269,17 +269,17 @@ void __init reset_all_zones_managed_pages(void)
  *
  * Returns the number of pages actually released.
  */
-unsigned long __init free_all_bootmem(void) // yyf: 启用老版本bootmem情况下（现在基本都是memblock）
+unsigned long __init free_all_bootmem(void) // kdev: 启用老版本bootmem情况下（现在基本都是memblock）
 {
 	unsigned long total_pages = 0;
 	bootmem_data_t *bdata;
 
-	reset_all_zones_managed_pages(); // yyf: 将所有内存区域的managed_pages计数器归零，确保伙伴系统能正确统计可用页
+	reset_all_zones_managed_pages(); // kdev: 将所有内存区域的managed_pages计数器归零，确保伙伴系统能正确统计可用页
 
 	list_for_each_entry(bdata, &bdata_list, list)
 		total_pages += free_all_bootmem_core(bdata);
 
-	totalram_pages += total_pages; // yyf: 累加释放的页数到totalram_pages，反映系统总可用内存
+	totalram_pages += total_pages; // kdev: 累加释放的页数到totalram_pages，反映系统总可用内存
 
 	return total_pages;
 }

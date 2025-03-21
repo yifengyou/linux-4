@@ -1234,7 +1234,7 @@ void __init e820__memory_setup(void)
 	/* This is a firmware interface ABI - make sure we don't break it: */
 	BUILD_BUG_ON(sizeof(struct boot_e820_entry) != 20);
 
-	// yyf: call e820__memory_setup_default
+	// kdev: call e820__memory_setup_default
 	who = x86_init.resources.memory_setup();
 
 	memcpy(e820_table_kexec, e820_table, sizeof(*e820_table_kexec));

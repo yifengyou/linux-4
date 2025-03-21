@@ -54,7 +54,7 @@ struct memblock memblock __initdata_memblock = {
 };
 
 //int memblock_debug __initdata_memblock;
-// yyf: enable memblock debug
+// kdev: enable memblock debug
 int memblock_debug __initdata_memblock = 1;
 static bool system_has_some_mirror __initdata_memblock = false;
 static int memblock_can_resize __initdata_memblock;
@@ -1768,7 +1768,7 @@ static int __init early_memblock(char *p)
 {
 	if (p && strstr(p, "debug"))
 		memblock_debug = 1;
-	// yyf: memblock_debug = 1;
+	// kdev: memblock_debug = 1;
 	memblock_debug = 1;
 	return 0;
 }

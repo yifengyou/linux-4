@@ -37,7 +37,7 @@ static void copy_boot_params(void)
 		(const struct old_cmdline *)OLD_CL_ADDRESS;
 
 	BUILD_BUG_ON(sizeof boot_params != 4096);
-	memcpy(&boot_params.hdr, &hdr, sizeof hdr); // yyf: hdr 就是引导程序传递的信息
+	memcpy(&boot_params.hdr, &hdr, sizeof hdr); // kdev: hdr 就是引导程序传递的信息
 
 	if (!boot_params.hdr.cmd_line_ptr &&
 	    oldcmd->cl_magic == OLD_CL_MAGIC) {
@@ -134,12 +134,12 @@ static void init_heap(void)
 
 void main(void)
 {
-	// yyf: 此时处于实模式，setup.bin
+	// kdev: 此时处于实模式，setup.bin
 	/* First, copy the boot header into the "zeropage" */
-	copy_boot_params(); // yyf: 拷贝 hdr 到 setup_header
+	copy_boot_params(); // kdev: 拷贝 hdr 到 setup_header
 
 	/* Initialize the early-boot console */
-	console_init(); // yyf: 初始化early printk 控制台
+	console_init(); // kdev: 初始化early printk 控制台
 	
 	if (cmdline_find_option_bool("debug"))
 		puts("early console in setup code\n");
@@ -148,7 +148,7 @@ void main(void)
 	init_heap();
 
 	/* Make sure we have all the proper CPU support */
-	if (validate_cpu()) { // yyf: 使用汇编指令检查cpu状态，指令集
+	if (validate_cpu()) { // kdev: 使用汇编指令检查cpu状态，指令集
 		puts("Unable to boot - please use a kernel appropriate "
 		     "for your CPU.\n");
 		die();
@@ -158,7 +158,7 @@ void main(void)
 	set_bios_mode();
 
 	/* Detect memory layout */
-	detect_memory(); // yyf: 实模式下，调用BIOS服务，探测内存布局，将信息放在boot_params
+	detect_memory(); // kdev: 实模式下，调用BIOS服务，探测内存布局，将信息放在boot_params
 
 	/* Set keyboard repeat rate (why?) and query the lock flags */
 	keyboard_init();

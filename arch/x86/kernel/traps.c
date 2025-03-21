@@ -253,7 +253,7 @@ do_trap(int trapnr, int signr, char *str, struct pt_regs *regs,
 	long error_code, siginfo_t *info)
 {
 	struct task_struct *tsk = current;
-	pr_info("yyf: Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
+	pr_info("kdev: Func:%s, File: %s, Line: %d\n", __FUNCTION__, __FILE__, __LINE__);
 
 	if (!do_trap_no_signal(tsk, trapnr, str, regs, error_code))
 		return;
@@ -1016,6 +1016,6 @@ void __init trap_init(void)
 	idt_setup_debugidt_traps();
 
 
-	// yyf: 打印idt详细信息
+	// kdev: 打印idt详细信息
 	kdev_print_idt_details();
 }

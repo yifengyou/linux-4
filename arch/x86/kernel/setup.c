@@ -912,7 +912,7 @@ void __init setup_arch(char **cmdline_p)
 	x86_init.oem.arch_setup();
 
 	iomem_resource.end = (1ULL << boot_cpu_data.x86_phys_bits) - 1;
-	e820__memory_setup(); // yyf: 解析e820内存信息
+	e820__memory_setup(); // kdev: 解析e820内存信息
 	parse_setup_data();
 
 	copy_edd();
@@ -959,9 +959,9 @@ void __init setup_arch(char **cmdline_p)
 	x86_configure_nx();
 
 
-	// yyf: 解析启动参数，这里是在arch中，负责架构相关的初始化设置。
+	// kdev: 解析启动参数，这里是在arch中，负责架构相关的初始化设置。
 	// 此时内核已经加载到内存中，但大部分的子系统还未初始化。
-	parse_early_param(); // yyf: parse parameter
+	parse_early_param(); // kdev: parse parameter
 
 	if (efi_enabled(EFI_BOOT))
 		efi_memblock_x86_reserve_range();
@@ -1116,7 +1116,7 @@ void __init setup_arch(char **cmdline_p)
 	为伙伴系统提供初始化所需的元数据内存。
 	直接跳过memblock的后果：内存管理无法初始化，导致内核启动失败。
 */
-	e820__memblock_setup(); // yyf: e820__memory_setup中e820探测到的内存布局放到memblock中
+	e820__memblock_setup(); // kdev: e820__memory_setup中e820探测到的内存布局放到memblock中
 
 	reserve_bios_regions();
 
@@ -1176,7 +1176,7 @@ void __init setup_arch(char **cmdline_p)
 		init_ohci1394_dma_on_all_controllers();
 #endif
 	/* Allocate bigger log buffer */
-	setup_log_buf(1); // yyf: setup log buffer
+	setup_log_buf(1); // kdev: setup log buffer
 
 	reserve_initrd();
 
@@ -1234,7 +1234,7 @@ void __init setup_arch(char **cmdline_p)
 	/*
 	 * Read APIC and some other early information from ACPI tables.
 	 */
-	acpi_boot_init(); // yyf: 初始化acpi表
+	acpi_boot_init(); // kdev: 初始化acpi表
 	sfi_init();
 	x86_dtb_init();
 

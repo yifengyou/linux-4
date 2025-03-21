@@ -2541,7 +2541,7 @@ void __init mem_init(void)
 {
 	high_memory = __va(last_valid_pfn << PAGE_SHIFT);
 
-	free_all_bootmem(); // yyf: 释放bootmem、memblock
+	free_all_bootmem(); // kdev: 释放bootmem、memblock
 
 	/*
 	 * Must be done after boot memory is put on freelist, because here we

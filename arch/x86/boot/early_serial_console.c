@@ -147,7 +147,7 @@ static void parse_console_uart8250(void)
 
 void console_init(void)
 {
-	parse_earlyprintk(); // yyf: 解析earlyprintk参数，不作用于tty，一般是ttyS0
+	parse_earlyprintk(); // kdev: 解析earlyprintk参数，不作用于tty，一般是ttyS0
 
 	if (!early_serial_base)
 		parse_console_uart8250();

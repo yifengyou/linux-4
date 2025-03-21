@@ -109,7 +109,7 @@ $(obj)/setup.bin: $(obj)/setup.elf FORCE
 	$(call if_changed,objcopy)
 
 $(obj)/compressed/vmlinux: FORCE
-	echo "yyf: $(Q)$(MAKE) $(build)=$(obj)/compressed $@"
+	echo "kdev: $(Q)$(MAKE) $(build)=$(obj)/compressed $@"
 	$(Q)$(MAKE) $(build)=$(obj)/compressed $@
 
 # Set this if you want to pass append arguments to the
@@ -142,7 +142,7 @@ fdimage288: $(obj)/bzImage $(obj)/mtools.conf
 	@$(kecho) 'Kernel: $(obj)/fdimage is ready'
 
 isoimage: $(obj)/bzImage
-	echo "yyf: $(cmd_genimage) ,isoimage, $(obj)/image.iso"
+	echo "kdev: $(cmd_genimage) ,isoimage, $(obj)/image.iso"
 	$(call cmd,genimage,isoimage,$(obj)/image.iso)
 	@$(kecho) 'Kernel: $(obj)/image.iso is ready'
 

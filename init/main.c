@@ -408,12 +408,12 @@ static noinline void __ref rest_init(void)
 	pr_kdev("%s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 
 
-	// yyf: show current thread num
+	// kdev: show current thread num
 	
 	pr_kdev("%s File:[%s],Line:[%d] no kthread created\n", __FUNCTION__, __FILE__, __LINE__);
 	yyf_count_all_threads();
 
-	rcu_scheduler_starting(); // yyf: 激活rcu调度器
+	rcu_scheduler_starting(); // kdev: 激活rcu调度器
 	/*
 	 * We need to spawn init first so that it obtains pid 1, however
 	 * the init task will end up wanting to create kthreads, which, if
@@ -421,7 +421,7 @@ static noinline void __ref rest_init(void)
 	 */
 	pid = kernel_thread(kernel_init, NULL, CLONE_FS);
 
-	// yyf: show current thread num
+	// kdev: show current thread num
 	pr_kdev("%s File:[%s],Line:[%d] new thread kernel_init\n", __FUNCTION__, __FILE__, __LINE__);
 	yyf_count_all_threads();
 	
@@ -442,7 +442,7 @@ static noinline void __ref rest_init(void)
 	kthreadd_task = find_task_by_pid_ns(pid, &init_pid_ns);
 	rcu_read_unlock();
 
-	// yyf: show current thread num
+	// kdev: show current thread num
 	pr_kdev("%s File:[%s],Line:[%d] new thread kthreadd\n", __FUNCTION__, __FILE__, __LINE__);
 	yyf_count_all_threads();
 
@@ -461,9 +461,9 @@ static noinline void __ref rest_init(void)
 	 * The boot idle thread must execute schedule()
 	 * at least once to get things moving:
 	 */
-	schedule_preempt_disabled(); // yyf: 禁用抢占
+	schedule_preempt_disabled(); // kdev: 禁用抢占
 	/* Call into cpu_idle with preempt disabled */
-	cpu_startup_entry(CPUHP_ONLINE); // yyf: 0号进程进入do_idle()循环
+	cpu_startup_entry(CPUHP_ONLINE); // kdev: 0号进程进入do_idle()循环
 }
 
 /* Check for early params. */
@@ -526,7 +526,7 @@ void __init __weak mem_encrypt_init(void) { }
 /*
  * Set up kernel memory allocators
  */
-static void __init mm_init(void) // yyf: memory management initialization
+static void __init mm_init(void) // kdev: memory management initialization
 {
 	/*
 	 * page_ext requires contiguous pages,
@@ -543,11 +543,11 @@ static void __init mm_init(void) // yyf: memory management initialization
 		初始化虚拟内存和 I/O 映射空间
 		处理 x86_64 架构特有的安全特性（如 PTI）
 	*/
-	page_ext_init_flatmem(); // yyf: 为每个物理页分配扩展元数据结构 page_ext，用于存储页状态跟踪、内存检测等高级功能数据
-	mem_init(); // yyf: 完成物理内存的最终初始化，释放启动阶段保留的内存到伙伴系统。
-	kmem_cache_init(); // yyf: 初始化 slab 分配器，创建用于分配小对象的缓存池。
-	pgtable_init(); // yyf: 初始化页表相关基础设施
-	vmalloc_init(); // yyf: 初始化 vmalloc 虚拟地址空间（位于内核地址空间的高端区域）
+	page_ext_init_flatmem(); // kdev: 为每个物理页分配扩展元数据结构 page_ext，用于存储页状态跟踪、内存检测等高级功能数据
+	mem_init(); // kdev: 完成物理内存的最终初始化，释放启动阶段保留的内存到伙伴系统。
+	kmem_cache_init(); // kdev: 初始化 slab 分配器，创建用于分配小对象的缓存池。
+	pgtable_init(); // kdev: 初始化页表相关基础设施
+	vmalloc_init(); // kdev: 初始化 vmalloc 虚拟地址空间（位于内核地址空间的高端区域）
 	ioremap_huge_init();
 	/* Should be run before the first non-init thread is created */
 	init_espfix_bsp();
@@ -560,9 +560,9 @@ asmlinkage __visible void __init start_kernel(void)
 	char *command_line;
 	char *after_dashes;
 
-	char *log_buf_ptr = log_buf_addr_get(); // yyf: log_buf是static
+	char *log_buf_ptr = log_buf_addr_get(); // kdev: log_buf是static
 
-	/* yyf: add multi variable type for test addr */
+	/* kdev: add multi variable type for test addr */
 	static long static_var = 0x1234567890ABCDEF;
 	long local_var = 0xEFDCBA0987654321;
 	char *str_ptr = "this_is_kernel_addr_test_string";
@@ -572,23 +572,23 @@ asmlinkage __visible void __init start_kernel(void)
 	pr_kdev("%s File:[%s],Line:[%d] start\n", __FUNCTION__, __FILE__, __LINE__);
 	pr_kdev("%s File:[%s],Line:[%d] enable early printk\n", __FUNCTION__, __FILE__, __LINE__);
 
-	// yyf: logbuf 是静态变量 static char __log_buf[__LOG_BUF_LEN] __aligned(LOG_ALIGN);
+	// kdev: logbuf 是静态变量 static char __log_buf[__LOG_BUF_LEN] __aligned(LOG_ALIGN);
 	// setup_log_buf() 重新设置缓存大小、空间
 	pr_kdev("early log_buf addr:[0x%px] log_buf_len=[%d](%dKB)\n", log_buf_ptr, log_buf_len_get(), log_buf_len_get()/1024);
 
-	// yyf: 基本整数类型
+	// kdev: 基本整数类型
 	pr_kdev("type [short] sizeof(short)=[%d]\n", sizeof(short));
 	pr_kdev("type [int] sizeof(int)=[%d]\n", sizeof(int));
 	pr_kdev("type [long] sizeof(long)=[%d]\n", sizeof(long));
 	pr_kdev("type [long long] sizeof(long long)=[%d]\n\n", sizeof(long long));
 	
-	// yyf: 无符号整数类型
+	// kdev: 无符号整数类型
 	pr_kdev("type [unsigned short] sizeof(unsigned short)=[%d]\n", sizeof(unsigned short));
 	pr_kdev("type [unsigned int] sizeof(unsigned int)=[%d]\n", sizeof(unsigned int));
 	pr_kdev("type [unsigned long] sizeof(unsigned long)=[%d]\n", sizeof(unsigned long));
 	pr_kdev("type [unsigned long long] sizeof(unsigned long long)=[%d]\n\n", sizeof(unsigned long long));
 	
-	// yyf: 显式位宽类型（需包含 <linux/types.h>）
+	// kdev: 显式位宽类型（需包含 <linux/types.h>）
 	pr_kdev("type [u8] sizeof(u8)=[%d]\n", sizeof(u8));
 	pr_kdev("type [u16] sizeof(u16)=[%d]\n", sizeof(u16));
 	pr_kdev("type [u32] sizeof(u32)=[%d]\n", sizeof(u32));
@@ -598,15 +598,15 @@ asmlinkage __visible void __init start_kernel(void)
 	pr_kdev("type [s32] sizeof(s32)=[%d]\n", sizeof(s32));
 	pr_kdev("type [s64] sizeof(s64)=[%d]\n\n", sizeof(s64));
 	
-	// yyf: 指针类型
+	// kdev: 指针类型
 	pr_kdev("type [void*] sizeof(void*)=[%d]\n", sizeof(void*));
 	pr_kdev("type [char*] sizeof(char*)=[%d]\n", sizeof(char*));
 	pr_kdev("type [int*] sizeof(int*)=[%d]\n", sizeof(int*));
 	pr_kdev("type [struct task_struct*] sizeof(struct task_struct*)=[%d]\n\n", sizeof(struct task_struct*));
 	
-	// yyf: 内核专用类型（需包含相关头文件）
-	pr_kdev("type [size_t] sizeof(size_t)=[%d]\n", sizeof(size_t)); // yyf: size_t（阳光型）无符号整型（unsigned long），表示不可能为负的计量值
-	pr_kdev("type [ssize_t] sizeof(ssize_t)=[%d]\n", sizeof(ssize_t)); // yyf: ssize_t（务实型）有符号整型（signed long），反馈成功/失败的场景
+	// kdev: 内核专用类型（需包含相关头文件）
+	pr_kdev("type [size_t] sizeof(size_t)=[%d]\n", sizeof(size_t)); // kdev: size_t（阳光型）无符号整型（unsigned long），表示不可能为负的计量值
+	pr_kdev("type [ssize_t] sizeof(ssize_t)=[%d]\n", sizeof(ssize_t)); // kdev: ssize_t（务实型）有符号整型（signed long），反馈成功/失败的场景
 	pr_kdev("type [phys_addr_t] sizeof(phys_addr_t)=[%d]\n", sizeof(phys_addr_t));
 	pr_kdev("type [loff_t] sizeof(loff_t)=[%d]\n", sizeof(loff_t));
 	pr_kdev("type [pid_t] sizeof(pid_t)=[%d]\n", sizeof(pid_t));
@@ -615,29 +615,29 @@ asmlinkage __visible void __init start_kernel(void)
 	pr_kdev("type [time64_t] sizeof(time64_t)=[%d]\n", sizeof(time64_t));
 	pr_kdev("type [bool] sizeof(bool)=[%d]\n\n", sizeof(bool));
 	
-	// yyf: 关键数据结构（大小可能随内核配置变化）
+	// kdev: 关键数据结构（大小可能随内核配置变化）
 	pr_kdev("type [struct task_struct] sizeof(struct task_struct)=[%d]\n", sizeof(struct task_struct));
 	pr_kdev("type [struct page] sizeof(struct page)=[%d]\n", sizeof(struct page));
 	pr_kdev("type [struct file] sizeof(struct file)=[%d]\n\n", sizeof(struct file));
 
 
-	// yyf: 打印静态变量信息
+	// kdev: 打印静态变量信息
 	static_phys = virt_to_phys(&static_var);
 	pr_kdev("Static variable Virtual addr:[%px] Physical addr:[0x%llx] Value:[0x%llx]\n",
 		&static_var, static_phys, static_var);
-	// yyf: 打印局部变量信息
+	// kdev: 打印局部变量信息
 	local_phys = virt_to_phys(&local_var);
 	pr_kdev("Local  variable Virtual addr:[%px] Physical addr:[0x%llx] Value:[0x%llx]\n",
 		&local_var, local_phys, local_var);
-	// yyf: 打印字符串信息
+	// kdev: 打印字符串信息
 	str_phys = virt_to_phys(str_ptr);
 	pr_kdev("String variable Virtual addr:[%px] Physical addr:[0x%llx] Value:[%s]\n\n",
 		str_ptr, str_phys, str_ptr);
 	
 
-	set_task_stack_end_magic(&init_task); // yyf: 为 0 号进程（init_task，即 idle 进程）的堆栈末端设置魔数（Magic Number），用于检测堆栈溢出。若堆栈越界破坏该魔数，内核会触发异常提示
-	smp_setup_processor_id(); // yyf: 对x86_64来说是空函数，其 CPU ID 通常由硬件或固件直接提供
-	debug_objects_early_init(); // yyf: 初始化内核调试子系统中的对象跟踪机制，用于检测内核对象（如链表、定时器）的生命周期错误（如重复释放、未初始化使用等）
+	set_task_stack_end_magic(&init_task); // kdev: 为 0 号进程（init_task，即 idle 进程）的堆栈末端设置魔数（Magic Number），用于检测堆栈溢出。若堆栈越界破坏该魔数，内核会触发异常提示
+	smp_setup_processor_id(); // kdev: 对x86_64来说是空函数，其 CPU ID 通常由硬件或固件直接提供
+	debug_objects_early_init(); // kdev: 初始化内核调试子系统中的对象跟踪机制，用于检测内核对象（如链表、定时器）的生命周期错误（如重复释放、未初始化使用等）
 
 	cgroup_init_early();
 
@@ -648,20 +648,20 @@ asmlinkage __visible void __init start_kernel(void)
 	 * Interrupts are still disabled. Do necessary setups, then
 	 * enable them.
 	 */
-	boot_cpu_init(); // yyf: 将当前运行的 CPU（BSP）标记为在线、活跃和存在的状态
+	boot_cpu_init(); // kdev: 将当前运行的 CPU（BSP）标记为在线、活跃和存在的状态
 	page_address_init();
 	pr_notice("%s", linux_banner);
 	
-	setup_arch(&command_line); // yyf: 设置体系结构相关设置、负责初始化自举分配器
+	setup_arch(&command_line); // kdev: 设置体系结构相关设置、负责初始化自举分配器
 	
 	mm_init_cpumask(&init_mm);
 	setup_command_line(command_line);
 	setup_nr_cpu_ids();
-	setup_per_cpu_areas(); // yyf: 定义percpu变量内存区域，初始化percpu变量
+	setup_per_cpu_areas(); // kdev: 定义percpu变量内存区域，初始化percpu变量
 	smp_prepare_boot_cpu();	/* arch-specific boot-cpu hooks */
 	boot_cpu_hotplug_init();
 
-	build_all_zonelists(NULL); // yyf: 建立node和zone数据结构
+	build_all_zonelists(NULL); // kdev: 建立node和zone数据结构
 	page_alloc_init();
 
 	pr_notice("Kernel command line: [%s]\n", boot_command_line);
@@ -682,16 +682,16 @@ asmlinkage __visible void __init start_kernel(void)
 	 * These use large bootmem allocations and must precede
 	 * kmem_cache_init()
 	 */
-	setup_log_buf(0); // yyf: 创建并配置内核的环形日志缓冲区，用于存储printk等接口输出的日志信息
-	// yyf: logbuf 是静态变量 static char __log_buf[__LOG_BUF_LEN] __aligned(LOG_ALIGN);
+	setup_log_buf(0); // kdev: 创建并配置内核的环形日志缓冲区，用于存储printk等接口输出的日志信息
+	// kdev: logbuf 是静态变量 static char __log_buf[__LOG_BUF_LEN] __aligned(LOG_ALIGN);
 	pr_kdev("new  log_buf addr:[0x%px] log_buf_len=[%d](%dKB)\n", log_buf_ptr, log_buf_len_get(), log_buf_len_get()/1024);
 	
 	vfs_caches_init_early();
 	
-	sort_main_extable(); // yyf: 异常向量表排序
+	sort_main_extable(); // kdev: 异常向量表排序
 	
 	trap_init(); // 初始化异常
-	mm_init(); // yyf: 停用bootmem分配器，迁移到实际的内存管理函数
+	mm_init(); // kdev: 停用bootmem分配器，迁移到实际的内存管理函数
 
 	ftrace_init();
 
@@ -763,7 +763,7 @@ asmlinkage __visible void __init start_kernel(void)
 	early_boot_irqs_disabled = false;
 	local_irq_enable();
 
-	kmem_cache_init_late(); // yyf: 初始化小块内存区域分配器
+	kmem_cache_init_late(); // kdev: 初始化小块内存区域分配器
 
 	/*
 	 * HACK ALERT! This is early. We're enabling the console before
@@ -827,7 +827,7 @@ asmlinkage __visible void __init start_kernel(void)
 #endif
 	kmemleak_init();
 	debug_objects_mem_init();
-	setup_per_cpu_pageset(); // yyf: 为每个cpu的zone的pageset数组的第一个元素分配内存
+	setup_per_cpu_pageset(); // kdev: 为每个cpu的zone的pageset数组的第一个元素分配内存
 	numa_policy_init();
 	acpi_early_init();
 	if (late_time_init)
@@ -871,11 +871,11 @@ asmlinkage __visible void __init start_kernel(void)
 	}
 
 	/* Do the rest non-__init'ed, we're now alive */
-	rest_init(); // yyf: 其余init任务，创建1号进程和2号进程
-	// yyf: 0号进程，也就是swapper转为空闲进程(idle进程)，进入无限循环
+	rest_init(); // kdev: 其余init任务，创建1号进程和2号进程
+	// kdev: 0号进程，也就是swapper转为空闲进程(idle进程)，进入无限循环
 	// idle无限循环不会结束，函数不会返回 cpu_idle_loop()
 
-	prevent_tail_call_optimization(); // yyf: 不会被执行
+	prevent_tail_call_optimization(); // kdev: 不会被执行
 
 	// rest_init() 是内核从初始化阶段过渡到用户空间的最终步骤。
 	// 由于它通过调度机制将执行流永久转移到空闲循环，
@@ -1061,7 +1061,7 @@ static void __init do_initcall_level(int level)
 		   initcall_command_line, __start___param,
 		   __stop___param - __start___param,
 		   level, level,
-		   NULL, &repair_env_string); // yyf: 每个level都调用参数解析
+		   NULL, &repair_env_string); // kdev: 每个level都调用参数解析
 
 	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++) {
 		pr_kdev("do_initcalls_%d Call Func:%pS\n", level, *fn);
@@ -1135,7 +1135,7 @@ static int run_init_process(const char *init_filename)
 	int yyf_i;
 	argv_init[0] = init_filename;
 
-	// yyf: 打印完整 argv 和 envp（必须NULL结尾）
+	// kdev: 打印完整 argv 和 envp（必须NULL结尾）
 	for (yyf_i = 0; argv_init[yyf_i]; yyf_i++)
 	    pr_kdev("%s File:[%s],Line:[%d] argv[%d]=%s\n",
 	    __FUNCTION__, __FILE__, __LINE__, yyf_i, argv_init[yyf_i]);
@@ -1207,8 +1207,8 @@ static int __ref kernel_init(void *unused)
 	pr_kdev("%s File:[%s],Line:[%d] kthread 1 kernel_init running!!\n",
 		__FUNCTION__, __FILE__, __LINE__);
 
-	kernel_init_freeable(); // yyf: 内核启动阶段，自由化=解除约束
-	// yyf: 解除SMP约束、解除动态加载模块约束、解除静态限制
+	kernel_init_freeable(); // kdev: 内核启动阶段，自由化=解除约束
+	// kdev: 解除SMP约束、解除动态加载模块约束、解除静态限制
 
 	
 	/* need to finish all async __init code before freeing the memory */
@@ -1300,17 +1300,17 @@ static noinline void __init kernel_init_freeable(void)
 
 	init_mm_internals();
 
-	do_pre_smp_initcalls(); // yyf: 调用initcall机制的early段的函数
+	do_pre_smp_initcalls(); // kdev: 调用initcall机制的early段的函数
 	lockup_detector_init();
 
-	smp_init(); // yyf: 激活其他 CPU（APs）
+	smp_init(); // kdev: 激活其他 CPU（APs）
 	sched_init_smp();
 
 	page_alloc_init_late();
 	/* Initialize page ext after all struct pages are initialized. */
 	page_ext_init();
 
-	do_basic_setup(); // yyf: 调用initcall机制的0-7段的函数
+	do_basic_setup(); // kdev: 调用initcall机制的0-7段的函数
 
 	/* Open the /dev/console on the rootfs, this should never fail */
 	if (sys_open((const char __user *) "/dev/console", O_RDWR, 0) < 0)

@@ -1092,7 +1092,7 @@ noinline void kgdb_breakpoint(void)
 	wmb(); /* Sync point before breakpoint */
 	arch_kgdb_breakpoint();
 	/*
-		yyf: ​这是实际触发断点的关键步骤，具体实现依赖 CPU 架构：
+		kdev: ​这是实际触发断点的关键步骤，具体实现依赖 CPU 架构：
 		​x86：执行 int3 指令（机器码 0xCC），触发断点异常。
 		​ARM：可能使用 BRK 指令。
 		执行这条指令后，CPU 会暂停当前程序，将控制权交给调试器（如 KGDB）。
