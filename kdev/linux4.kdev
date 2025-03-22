@@ -6,6 +6,7 @@ vmname = kdev-linux4
 config = ubuntu18_x86_64_defconfig
 nodocker = False
 mrproper = False
+isoimage = False
 rclocal = /linux/linux-4.git-build-x86_64/rclocal
 qcow2_image = /linux/linux-4.git-build-x86_64/rootfs.qcow2
 
