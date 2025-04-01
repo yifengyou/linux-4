@@ -24,5 +24,5 @@ int main()
 			real_waitid(P_ALL, 0, &info, WEXITED, 0);
 		}
 	}
-	return 0;
+	_exit(0);
 }
