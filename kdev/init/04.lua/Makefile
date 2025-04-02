@@ -1,17 +1,14 @@
 .PHONY = lua default clean
 
 default: shell lua
+	chmod +x init lua
 	echo init > filelist
 	echo lua >> filelist
 	cat filelist | cpio -H newc -o > init.cpio
-
+	cpio -tv < init.cpio
 
 shell:
-	gcc -c shell.c -o shell.o
-	as sys.S -o sys.o
-	ld sys.o shell.o -o shell --entry main -z noexecstack
-	ls -alh shell
-	mv shell init
+	gcc -static shell.c -o init
 
 lua:
 	wget -c https://www.lua.org/ftp/lua-5.4.7.tar.gz
@@ -23,5 +20,5 @@ lua:
 	ldd lua || :
 
 clean:
-	rm -f *.o lua init shell *.cpio
+	rm -rf *.o lua init shell *.cpio filelist lua-5.4.7
 

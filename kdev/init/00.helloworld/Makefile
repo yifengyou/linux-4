@@ -4,3 +4,5 @@ default:
 	echo init | cpio -H newc -o > init.cpio
 
 
+clean:
+	rm -f init init.cpio
