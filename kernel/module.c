@@ -1271,7 +1271,7 @@ static int try_to_force_load(struct module *mod, const char *reason)
 	return 0;
 #else
 	pr_kdev("%s File:[%s],Line:[%d] CONFIG_MODULE_FORCE_LOAD not enabled! skip load!\n",
-		__FUNCTION__, __FILE__, __LINE__, mod->name, modmagic, vermagic);
+		__FUNCTION__, __FILE__, __LINE__);
 	return -ENOEXEC;
 #endif
 }
