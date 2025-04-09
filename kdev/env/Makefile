@@ -1,10 +1,12 @@
 .PHONY: default help build run pull push vm all
 
 TIMESTAMP=$(shell date +"%Y%m%d")
+ARCH=$(shell uname -m)
 
 default: help
 
 help:
+	@echo "dockerpull       pulll base docker image"
 	@echo "build            build docker image"
 	@echo "pull             pull docker image"
 	@echo "push             push docker image"
@@ -13,8 +15,12 @@ help:
 	@echo "all              build docker and build vm"
 	@echo TIMESTAMP: $(TIMESTAMP)
 
+dockerpull:
+	docker pull hub.rat.dev/ubuntu:18.04
+	docker tag hub.rat.dev/ubuntu:18.04 ubuntu:18.04
+
 build:
-	cd docker && docker build -t yifengyou/linux4.0:latest  .
+	cd docker && docker build -f Dockerfile.$(ARCH) -t yifengyou/linux4.0:latest  .
 	docker tag yifengyou/linux4.0:latest yifengyou/linux4.0:$(TIMESTAMP)
 	docker tag yifengyou/linux4.0:latest yifengyou/linux4.0-ubuntu:$(TIMESTAMP)
 	docker tag yifengyou/linux4.0:latest yifengyou/linux4.0-ubuntu18.04:$(TIMESTAMP)
