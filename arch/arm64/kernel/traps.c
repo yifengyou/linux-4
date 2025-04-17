@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Based on arch/arm/kernel/traps.c
  *
  * Copyright (C) 1995-2009 Russell King
@@ -150,6 +150,58 @@ void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk)
 	} while (!unwind_frame(tsk, &frame));
 
 	put_task_stack(tsk);
+}
+
+int kdev_get_task_stack_path(struct task_struct *task, struct pt_regs *regs,
+		unsigned long *stack, char *log_lvl)
+{
+	struct stackframe frame;
+	int depth = 0;
+
+	if (!try_get_task_stack(task))  // 确保任务堆栈可访问
+		return -1;
+
+	// 初始化堆栈帧结构[1,3](@ref)
+	if (regs) {
+		frame.fp = regs->regs[29]; // ARM64帧指针x29
+		frame.pc = regs->pc;
+	} else if (task == current) {
+		frame.fp = (unsigned long)__builtin_frame_address(0);
+		frame.pc = (unsigned long)kdev_get_task_stack_path;
+	} else {
+		frame.fp = thread_saved_fp(task); // 获取保存的帧指针[1](@ref)
+		frame.pc = thread_saved_pc(task);
+	}
+
+	// 设置堆栈边界检查[1,10](@ref)
+	frame.graph = 0;
+#ifdef CONFIG_FUNCTION_GRAPH_TRACER
+	frame.graph = task->curr_ret_stack;
+#endif
+
+	// 遍历堆栈帧[10](@ref)
+	while (1) {
+		int ret = unwind_frame(task, &frame);
+		if (ret < 0 || !frame.fp) // 无法继续解帧时终止
+			break;
+
+		depth++; // 每成功解开一帧计数+1
+
+		// 安全检查：防止无效堆栈地址[10](@ref)
+		if (!on_accessible_stack(task, frame.fp))
+			break;
+	}
+
+	put_task_stack(task); // 释放堆栈访问权限
+
+	return depth;
+}
+
+int do_kdev_get_stack_depth(struct task_struct *tsk, unsigned long *sp)
+{
+	int depth = kdev_get_task_stack_path(tsk, NULL, sp, KERN_DEFAULT);
+	barrier();
+	return depth;
 }
 
 void show_stack(struct task_struct *tsk, unsigned long *sp)

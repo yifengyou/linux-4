@@ -117,23 +117,22 @@ int kdev_get_task_stack_path(struct task_struct *task, struct pt_regs *regs,
 
 	// 遍历所有堆栈帧
 	for (; stack; stack = PTR_ALIGN(stack_info.next_sp, sizeof(long))) {
-	    if (get_stack_info(stack, task, &stack_info, &visit_mask))
-	        break;
+		if (get_stack_info(stack, task, &stack_info, &visit_mask))
+			break;
 
-	    // 核心逻辑：每成功解开一个堆栈帧，深度+1
-	    while (1) {
-	        unsigned long *ret_addr_p = unwind_get_return_address_ptr(&state);
-	        if (!ret_addr_p) break; // 无法继续解开时终止
+		// 核心逻辑：每成功解开一个堆栈帧，深度+1
+		while (1) {
+			unsigned long *ret_addr_p = unwind_get_return_address_ptr(&state);
+			if (!ret_addr_p) break; // 无法继续解开时终止
 
-	        depth++; // 增加深度
-	        if (unwind_next_frame(&state) < 0) // 尝试解开下一帧
-	            break;
-	    }
+			depth++; // 增加深度
+			if (unwind_next_frame(&state) < 0) // 尝试解开下一帧
+				break;
+		}
 	}
 
 	return depth;
 }
-
 
 void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 			unsigned long *stack, char *log_lvl)
