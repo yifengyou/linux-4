@@ -1,0 +1,3 @@
+[submodule "kdev.git"]
+	path = kdev.git
+	url = git@github.com:yifengyou/kdev
