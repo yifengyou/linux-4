@@ -1,0 +1,18 @@
+sourcedir = /linux/linux-4.git
+arch = x86_64
+debug = True
+docker_image = yifengyou/linux4.0:latest
+skipimagecheck = True
+vmname = kdev-linux4
+config = ubuntu18_x86_64_defconfig
+nodocker = False
+mrproper = False
+rclocal = /linux/linux-4.git-build-x86_64/rclocal
+qcow2_image = /linux/linux-4.git-build-x86_64/rootfs.qcow2
+# initrd = /linux/linux-4.git-build-x86_64/build/kdev/init/00.helloworld/init.cpio
+# initrd = /linux/linux-4.git-build-x86_64/build/kdev/init/02.shell/init.cpio
+# initrd = /linux/linux-4.git-build-x86_64/build/kdev/init/03.lua/init.cpio
+# initrd = /linux/linux-4.git-build-x86_64/build/kdev/init/05.busybox/initrd.img
+initrd = /linux/linux-4.git/kdev/init/06.ubuntu/initrd.img
+
+
